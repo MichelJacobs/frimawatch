@@ -1,0 +1,36 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Notification extends Model
+{
+    use HasFactory;
+
+    protected $table = 'notifications';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'user_id',
+        'keyword',
+        'upper_price',
+        'lower_price',
+        'item_status',
+    ];
+
+    public function excluded_words()
+    {
+        return $this->hasMany(NotificationExculdedWord::class);
+    }
+
+    public function excluded_services()
+    {
+        return $this->hasMany(NotificationExculdedService::class);
+    }
+}
