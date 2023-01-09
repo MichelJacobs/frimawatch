@@ -27,5 +27,5 @@ Route::middleware(['auth', 'user'])->group(function () {
 Route::group(['middleware' => ['auth','admin']], function () {
     Route::resource('/user', 'App\Http\Controllers\UserController');
     Route::post('/user/disable', 'App\Http\Controllers\UserController@disableUser')->name('user.disable');
-    Route::post('/user/enable', 'App\Http\Controllers\UserController@enableUser')->name('user.enalbe');
+    Route::post('/user/enable', 'App\Http\Controllers\UserController@enableUser')->name('user.enable');
  });
