@@ -17,10 +17,11 @@ class CreateSearchsTable extends Migration
             $table->id();
             $table->bigInteger('user_id')->nullable()->unsigned()->comment('User ID');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('keyword');
-            $table->Integer('upper_price');
-            $table->Integer('lower_price');
-            $table->string('item_status');
+            $table->string('keyword')->nullable();
+            $table->Integer('upper_price')->nullable();
+            $table->Integer('lower_price')->nullable();
+            $table->string('excluded_words')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

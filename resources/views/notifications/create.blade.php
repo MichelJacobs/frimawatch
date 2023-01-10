@@ -32,53 +32,57 @@
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="keyword">キーワード</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="keyword" class="form-control" value="">
+                                                    <input type="text" name="keyword" class="form-control" value="" required>
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
-                                                <label class="col-md-2 col-form-label" for="lower-price">下限価格</label>
+                                                <label class="col-md-2 col-form-label" for="lower_price">下限価格</label>
                                                 <div class="col-md-10">
-                                                    <input class="form-control" type="number" name="lower-price">
+                                                    <input class="form-control" type="number" name="lower_price">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
-                                                <label class="col-md-2 col-form-label" for="upper-price">上限価格</label>
+                                                <label class="col-md-2 col-form-label" for="upper_price">上限価格</label>
                                                 <div class="col-md-10">
-                                                    <input class="form-control" type="number" name="upper-price">
+                                                    <input class="form-control" type="number" name="upper_price">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="excluded_word">除外ワード</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="excluded_word" class="form-control" placeholder="、で区切ります。">
+                                                    <input type="text" name="excluded_word" class="form-control" placeholder="スペースで区切ります。">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
-                                                <label class="col-md-2 col-form-label">除外サービス</label>
+                                                <label class="col-md-2 col-form-label">対象のサービス</label>
                                                 <div class="col-md-10">
-                                                    <select multiple="multiple" name="excluded_service" class="form-control">
-                                                        <option>1</option>
-                                                        <option>2</option>
-                                                        <option>3</option>
-                                                        <option>4</option>
-                                                        <option>5</option>
+                                                    <select multiple="multiple" name="services[]" class="form-control" required>
+                                                        <option value="https://plus.wowma.jp/user/39095799/plus/">(ブランディア)</option>
+                                                        <option value="https://www.2ndstreet.jp/store">(セカンドストリートオンライン)</option>
+                                                        <option value="https://komehyo.jp/">(コメ兵)</option>
+                                                        <option value="https://jp.mercari.com/">(メルカリ)</option>
+                                                        <option value="https://auctions.yahoo.co.jp/">(ヤフオク)</option>
+                                                        <option value="https://www.ecoauc.com/client">(エコリングオークション)</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
-                                                <label class="col-md-2 col-form-label" for="status">スターテス</label>
+                                                <label class="col-md-2 col-form-label" for="status">商品の状態</label>
                                                 <div class="col-md-10">
                                                     <input type="text" name="status" class="form-control" value="">
                                                 </div>
                                             </div>
-
+                                     
                                             <div class="mb-2 row">
-                                                <div class="button-list text-end"><input type="submit" value="追加する" class="btn btn-primary pl-4 pr-4 mr-3"></div>
+                                                <div class="button-list text-end">
+                                                    <input type="button" value="プレビュー" class="btn btn-success pl-4 pr-4 mr-3">
+                                                    <input type="submit" value="追加する" class="btn btn-primary pl-4 pr-4 mr-3">
+                                                </div>
                                             </div>
                                         </form>
                                     </div>

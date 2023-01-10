@@ -21,16 +21,17 @@ class Notification extends Model
         'keyword',
         'upper_price',
         'lower_price',
-        'item_status',
+        'excluded_words',
+        'status',
     ];
 
-    public function excluded_words()
+    public function user(): BelongsTo
     {
-        return $this->hasMany(NotificationExculdedWord::class);
+        return $this->belongsTo(User::class);
     }
 
-    public function excluded_services()
+    public function services()
     {
-        return $this->hasMany(NotificationExculdedService::class);
+        return $this->hasMany(NotificationService::class);
     }
 }

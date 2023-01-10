@@ -21,7 +21,8 @@ class Search extends Model
         'keyword',
         'upper_price',
         'lower_price',
-        'item_status',
+        'excluded_words',
+        'status',
     ];
 
     public function excluded_words()

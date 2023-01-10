@@ -7,7 +7,19 @@
         <!-- Start Content-->
         <div class="container-fluid">
 
-            
+            <div class="row mt-3">
+                <div class="col-12">
+                    @foreach (['info', 'success', 'danger', 'warning'] as $msg)
+                        @if (Session::has('system.message.' . $msg))
+                            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                {{ Session::get('system.message.' . $msg) }}
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -35,8 +47,8 @@
                                             <th>下限価格</th>
                                             <th>上限価格</th>
                                             <th>除外ワード</th>
-                                            <th>除外サービス</th>
-                                            <th>スターテス</th>
+                                            <th>対象のサービス</th>
+                                            <th>商品の状態</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -46,12 +58,21 @@
                                             <td>{{$notification->keyword}}</td>
                                             <td>{{$notification->lower_price}}</td>
                                             <td>{{$notification->upper_price}}</td>
-                                            <td>{{$notification->excluded_word}}</td>
-                                            <td>{{$notification->excluded_service}}</td>
-                                            <td>{{$notification->item_status}}</td>
+                                            <td>{{$notification->excluded_words}}</td>
                                             <td>
-                                                <a href="{{ route('notification.show', $notification->id) }}" class="btn btn-sm btn-block btn-primary mt-1">詳細</a>
-                                                <button type="button" class="btn btn-sm btn-block mt-1 btn-danger btn-delete-company" data-id="{{ $notification->id }}">削除</button>
+                                                @foreach ($notification->services as $service)
+                                                    {{$service->service}}<br>
+                                                @endforeach
+                                            </td>
+                                            <td>{{$notification->status}}</td>
+                                            <td>
+                                                {{-- <a href="{{ route('notification.show', $notification->id) }}" class="btn btn-sm btn-block btn-primary mt-1">詳細</a> --}}
+                                                <form action="{{ route('notification.destroy',$notification)}}" method="post">
+                                                    <input type="hidden" name="_method" value="delete" />
+                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-block mt-1 btn-danger btn-delete-company" data-id="{{ $notification->id }}">削除</button>
+                                                </form>
+                                                
                                         </tr>
                                         @empty
                                         <tr>
