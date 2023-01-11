@@ -79,7 +79,7 @@
                                      
                                             <div class="mb-2 row">
                                                 <div class="button-list text-end">
-                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#standard-modal">プレビュー</button>
+                                                    <button type="button" class="btn btn-success" id="preview" data-bs-toggle="modal" data-bs-target="#standard-modal">プレビュー</button>
                                                     <input type="submit" value="追加する" class="btn btn-primary pl-4 pr-4 mr-3">
                                                 </div>
                                             </div>
@@ -98,23 +98,12 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="row">  
+                                            <div class="row" id="search_results">  
                                                 <div class="d-flex justify-content-center" id="loading">
                                                     <div class="spinner-border text-success m-2" role="status"></div>
                                                 </div>
                                              
-                                                {{-- <div class="col-xl-12 col-md-12">
-                                                    <div class="d-flex">
-                                                        <div style="width:100px;height:100px;">
-                                                            <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
-                                                        </div>
-                                                        <div class="col-xl-8 col-md-8 p-2">
-                                                            <h6 class="mt-0 mb-1 text-danger">7500</h6>
-                                                            <p class="text-muted mb-0 font-13">テキストテキストテキストテキストテキスト</p>
-                                                            <p class="text-muted mb-0 font-13">wowma</p>
-                                                        </div>
-                                                    </div>
-                                                </div> --}}
+                                               
                                             </div>
                                         </div>
                                         <div class="modal-footer">
@@ -137,4 +126,44 @@
     </div> <!-- content -->
 
 </div>
+@endsection m 
+
+
+
+@section('scripts')
+<script>
+    $( document ).ready(function() {
+        $('#preview').on('click',function() {
+            console.log("ready");
+            var results = ` <div class="col-xl-12 col-md-12">
+                                <div class="d-flex">
+                                    <div style="width:100px;height:100px;">
+                                        <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
+                                    </div>
+                                    <div class="col-xl-8 col-md-8 p-2">
+                                        <h6 class="mt-0 mb-1 text-danger">7500</h6>
+                                        <p class="text-muted mb-0 font-13">テキストテキストテキストテキストテキスト</p>
+                                        <p class="text-muted mb-0 font-13">wowma</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-md-12">
+                                <div class="d-flex">
+                                    <div style="width:100px;height:100px;">
+                                        <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
+                                    </div>
+                                    <div class="col-xl-8 col-md-8 p-2">
+                                        <h6 class="mt-0 mb-1 text-danger">7500</h6>
+                                        <p class="text-muted mb-0 font-13">テキストテキストテキストテキストテキスト</p>
+                                        <p class="text-muted mb-0 font-13">wowma</p>
+                                    </div>
+                                </div>
+                            </div>`;
+            $("#loading").remove();
+
+            $('#search_results').children().remove();
+            $('#search_results').append(results);
+        })
+    });
+</script>
 @endsection
