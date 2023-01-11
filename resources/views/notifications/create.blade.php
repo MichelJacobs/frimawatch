@@ -98,8 +98,12 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="row">
-                                                <div class="col-xl-12 col-md-12">
+                                            <div class="row">  
+                                                <div class="d-flex justify-content-center" id="loading">
+                                                    <div class="spinner-border text-success m-2" role="status"></div>
+                                                </div>
+                                             
+                                                {{-- <div class="col-xl-12 col-md-12">
                                                     <div class="d-flex">
                                                         <div style="width:100px;height:100px;">
                                                             <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
@@ -110,19 +114,7 @@
                                                             <p class="text-muted mb-0 font-13">wowma</p>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="col-xl-12 col-md-12">
-                                                    <div class="d-flex">
-                                                        <div style="width:100px;height:100px;">
-                                                            <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
-                                                        </div>
-                                                        <div class="col-xl-8 col-md-8 p-2">
-                                                            <h6 class="mt-0 mb-1 text-danger">6500</h6>
-                                                            <p class="text-muted mb-0 font-13">テキストテキストテキストテキスト</p>
-                                                            <p class="text-muted mb-0 font-13">2ndstreet</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                </div> --}}
                                             </div>
                                         </div>
                                         <div class="modal-footer">
