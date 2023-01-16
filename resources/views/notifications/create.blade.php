@@ -31,35 +31,35 @@
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="keyword">キーワード</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="keyword" class="form-control" value="" required>
+                                                    <input type="text" name="keyword" id="keyword" class="form-control" value="" required>
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="lower_price">下限価格</label>
                                                 <div class="col-md-10">
-                                                    <input class="form-control" type="number" name="lower_price">
+                                                    <input class="form-control" type="number" id="lower_price" name="lower_price">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="upper_price">上限価格</label>
                                                 <div class="col-md-10">
-                                                    <input class="form-control" type="number" name="upper_price">
+                                                    <input class="form-control" type="number" id="upper_price" name="upper_price">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="excluded_word">除外ワード</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="excluded_word" class="form-control" placeholder="スペースで区切ります。">
+                                                    <input type="text" id="excluded_word" name="excluded_word" class="form-control" placeholder="スペースで区切ります。">
                                                 </div>
                                             </div>
 
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label">対象のサービス</label>
                                                 <div class="col-md-10">
-                                                    <select multiple="multiple" name="services[]" class="form-control" required>
+                                                    <select multiple="multiple" name="services[]" id="services" class="form-control" required>
                                                         <option value="https://plus.wowma.jp/user/39095799/plus/">(ブランディア)(wowma)</option>
                                                         <option value="https://www.2ndstreet.jp/store">(セカンドストリートオンライン)(2ndstreet)</option>
                                                         <option value="https://komehyo.jp/">(コメ兵)(komehyo)</option>
@@ -73,7 +73,7 @@
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="status">商品の状態</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="status" class="form-control" value="">
+                                                    <input type="text" id="item_status" name="status" class="form-control" value="">
                                                 </div>
                                             </div>
                                      
@@ -126,43 +126,37 @@
     </div> <!-- content -->
 
 </div>
-@endsection m 
-
-
+@endsection
 
 @section('scripts')
 <script>
     $( document ).ready(function() {
         $('#preview').on('click',function() {
-            console.log("ready");
-            var results = ` <div class="col-xl-12 col-md-12">
-                                <div class="d-flex">
-                                    <div style="width:100px;height:100px;">
-                                        <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
-                                    </div>
-                                    <div class="col-xl-8 col-md-8 p-2">
-                                        <h6 class="mt-0 mb-1 text-danger">7500</h6>
-                                        <p class="text-muted mb-0 font-13">テキストテキストテキストテキストテキスト</p>
-                                        <p class="text-muted mb-0 font-13">wowma</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-12 col-md-12">
-                                <div class="d-flex">
-                                    <div style="width:100px;height:100px;">
-                                        <img src="{{ asset('assets/images/small/img-3.jpg') }}" class="img-fluid" alt="result">
-                                    </div>
-                                    <div class="col-xl-8 col-md-8 p-2">
-                                        <h6 class="mt-0 mb-1 text-danger">7500</h6>
-                                        <p class="text-muted mb-0 font-13">テキストテキストテキストテキストテキスト</p>
-                                        <p class="text-muted mb-0 font-13">wowma</p>
-                                    </div>
-                                </div>
-                            </div>`;
-            $("#loading").remove();
-
             $('#search_results').children().remove();
-            $('#search_results').append(results);
+            var keyword = $("#keyword").val();
+            var lower_price = $("#lower_price").val();
+            var upper_price = $("#upper_price").val();
+            var excluded_word = $("#excluded_word").val();
+            var services = $("#services").val();
+            var status = $("#item_status").val();
+            $.ajax({
+                type:'POST',
+                url:"{{ route('scrape') }}",
+                data:{
+                    keyword:keyword,
+                    lower_price:lower_price,
+                    upper_price:upper_price,
+                    excluded_word:excluded_word,
+                    services:services,
+                    status:status,
+                    _token: '{{csrf_token()}}'},
+                success:function(results){
+                    $("#loading").remove();
+                    $('#search_results').append(results);
+                        
+                }
+            });
+            
         })
     });
 </script>

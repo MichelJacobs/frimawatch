@@ -21,6 +21,7 @@ Auth::routes();
 
 Route::middleware(['auth', 'user'])->group(function () {
     Route::resource('/notification', 'App\Http\Controllers\NotificationController');
+    Route::post('/scrape', 'App\Http\Controllers\NotificationController@scrape')->name('scrape');
     Route::resource('/search', 'App\Http\Controllers\SearchController');
 });
 
