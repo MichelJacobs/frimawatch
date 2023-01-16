@@ -168,7 +168,7 @@ class NotificationController extends Controller
                             </div>';
                 }
             }else{
-                $str = '一致する商品が見つかりません。';
+                $str = '<div class="text-center">一致する商品が見つかりません。</div>';
             }
             
             // $str = 'シャツ';
