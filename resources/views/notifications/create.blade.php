@@ -98,8 +98,8 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="d-flex justify-content-center" id="loading">
-                                                <div class="spinner-border text-success m-2" role="status"></div>
+                                            <div class="d-flex justify-content-center">
+                                                <div class="spinner-border text-success m-2" role="status" id="loading"></div>
                                             </div>
                                             <div class="row" id="search_results">  
                                                
@@ -132,6 +132,7 @@
     $( document ).ready(function() {
         $('#preview').on('click',function() {
             $('#search_results').children().remove();
+            $("#loading").show();
             var keyword = $("#keyword").val();
             var lower_price = $("#lower_price").val();
             var upper_price = $("#upper_price").val();
@@ -139,6 +140,7 @@
             var services = $("#services").val();
             var status = $("#item_status").val();
             if(!keyword)alert("キーワードを入力してください。");
+            if(services.length == 0)alert("対象のサービスを選択してください。");
             $.ajax({
                 type:'POST',
                 url:"{{ route('scrape') }}",
@@ -151,7 +153,7 @@
                     status:status,
                     _token: '{{csrf_token()}}'},
                 success:function(results){
-                    $("#loading").remove();
+                    $("#loading").hide();
                     $('#search_results').append(results);
                         
                 }
