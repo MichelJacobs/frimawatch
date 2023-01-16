@@ -98,11 +98,10 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
+                                            <div class="d-flex justify-content-center" id="loading">
+                                                <div class="spinner-border text-success m-2" role="status"></div>
+                                            </div>
                                             <div class="row" id="search_results">  
-                                                <div class="d-flex justify-content-center" id="loading">
-                                                    <div class="spinner-border text-success m-2" role="status"></div>
-                                                </div>
-                                             
                                                
                                             </div>
                                         </div>
