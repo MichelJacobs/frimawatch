@@ -131,6 +131,7 @@
 <script>
     $( document ).ready(function() {
         $('#preview').on('click',function() {
+            $("#loading").show();
             $('#search_results').children().remove();
             var keyword = $("#keyword").val();
             var lower_price = $("#lower_price").val();
@@ -138,6 +139,7 @@
             var excluded_word = $("#excluded_word").val();
             var services = $("#services").val();
             var status = $("#item_status").val();
+            if(!keyword)alert("キーワードを入力してください。");
             $.ajax({
                 type:'POST',
                 url:"{{ route('scrape') }}",
@@ -150,7 +152,7 @@
                     status:status,
                     _token: '{{csrf_token()}}'},
                 success:function(results){
-                    $("#loading").remove();
+                    $("#loading").hide();
                     $('#search_results').append(results);
                         
                 }
