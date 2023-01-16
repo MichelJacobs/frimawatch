@@ -102,22 +102,8 @@ class NotificationController extends Controller
             // }else if()
             if($count > 5) break;
             $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-            $response = Http::get('https://wowma.jp/catalog/api/search/items', [
-                'keyword' => $new,
-                'e_scope' => 'O',
-                'user' => 39095799,
-                'x' => 0,
-                'y' => 0,
-                'page' => 0,
-                'uads' => 0,
-                'acc_filter' => 'N',
-                'shop_only' => 'Y',
-                'ref_id' => 'catalog_klist2',
-                'mode' => 'pc',
-            ]);
-            $pages = $response->object();
-            $pageInfo = $pages->pageInformation;
-// itemImageUrl;currentPrice
+            $totalPages = 10;
+
             for($i = 0; $i < $pageInfo->totalPages; $i++) {
                 $response = Http::get('https://wowma.jp/catalog/api/search/items', [
                     'keyword' => $new,
@@ -132,6 +118,9 @@ class NotificationController extends Controller
                     'ref_id' => 'catalog_klist2',
                     'mode' => 'pc',
                 ]);
+                if($i == 0) {
+                    $totalPages = $response->object()->pageInformation;
+                }
                 $hitItems = $response->object()->hitItems;
                 foreach($hitItems as $item) {
                     if($count > 5) break;
