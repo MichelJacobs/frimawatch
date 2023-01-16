@@ -119,7 +119,7 @@ class NotificationController extends Controller
                     'mode' => 'pc',
                 ]);
                 if($i == 0) {
-                    $totalPages = $response->object()->pageInformation;
+                    $totalPages = $response->object()->pageInformation->totalPages;
                 }
                 $hitItems = $response->object()->hitItems;
                 foreach($hitItems as $item) {
