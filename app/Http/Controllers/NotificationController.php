@@ -104,7 +104,7 @@ class NotificationController extends Controller
             $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
             $totalPages = 10;
 
-            for($i = 0; $i < $pageInfo->totalPages; $i++) {
+            for($i = 0; $i < $totalPages; $i++) {
                 $response = Http::get('https://wowma.jp/catalog/api/search/items', [
                     'keyword' => $new,
                     'e_scope' => 'O',
