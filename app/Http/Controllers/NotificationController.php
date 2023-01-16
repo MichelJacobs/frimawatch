@@ -152,20 +152,25 @@ class NotificationController extends Controller
             // ]);
             // $pages = $response->object();
             $str = '';
-            foreach($results as $item) {
-                $str .= '<div class="col-xl-12 col-md-12">
-                <div class="d-flex">
-                    <div style="width:100px;height:100px;">
-                        <img src="'.$item['itemImageUrl'].'" class="img-fluid" alt="result">
-                    </div>
-                    <div class="col-xl-8 col-md-8 p-2">
-                        <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'円</h6>
-                        <p class="text-muted mb-0 font-13">'.$item['itemName'].'</p>
-                        <p class="text-muted mb-0 font-13">wowma</p>
-                    </div>
-                </div>
-            </div>';
+            if(count($results) > 0) {
+                foreach($results as $item) {
+                    $str .= '<div class="col-xl-12 col-md-12">
+                                <div class="d-flex">
+                                    <div style="width:100px;height:100px;">
+                                        <img src="'.$item['itemImageUrl'].'" class="img-fluid" alt="result">
+                                    </div>
+                                    <div class="col-xl-8 col-md-8 p-2">
+                                        <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'円</h6>
+                                        <p class="text-muted mb-0 font-13">'.$item['itemName'].'</p>
+                                        <p class="text-muted mb-0 font-13">wowma</p>
+                                    </div>
+                                </div>
+                            </div>';
+                }
+            }else{
+                $str = '一致する商品が見つかりません。';
             }
+            
             // $str = 'シャツ';
             // $keyword = mb_convert_encoding($str,"SJIS","auto");dd($keyword);
             // $response = Http::get('https://wowma.jp/catalog/api/search/items?keyword='.$keyword.'&e_scope=O&user=39095799&x=0&y=0&page=9&uads=0&acc_filter=N&shop_only=Y&ref_id=catalog_klist2&mode=pc');
