@@ -169,7 +169,7 @@ class NotificationController extends Controller
                         <img src="'.$item['itemImageUrl'].'" class="img-fluid" alt="result">
                     </div>
                     <div class="col-xl-8 col-md-8 p-2">
-                        <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'</h6>
+                        <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'円</h6>
                         <p class="text-muted mb-0 font-13">'.$item['itemName'].'</p>
                         <p class="text-muted mb-0 font-13">wowma</p>
                     </div>
