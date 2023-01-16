@@ -105,6 +105,7 @@ class NotificationController extends Controller
             $totalPages = 10;
 
             for($i = 0; $i < $totalPages; $i++) {
+                if($count > 5) break;
                 $response = Http::get('https://wowma.jp/catalog/api/search/items', [
                     'keyword' => $new,
                     'e_scope' => 'O',
