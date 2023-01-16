@@ -26,7 +26,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="p-2">
-                                        <form method="POST" action="{{route('notification.store')}}" class="form-horizontal" role="form">
+                                        <form method="POST" action="{{route('notification.store')}}" class="form-horizontal" role="form" id="storeForm">
                                             @csrf
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="keyword">キーワード</label>
@@ -60,12 +60,12 @@
                                                 <label class="col-md-2 col-form-label">対象のサービス</label>
                                                 <div class="col-md-10">
                                                     <select multiple="multiple" name="services[]" id="services" class="form-control" required>
-                                                        <option value="https://plus.wowma.jp/user/39095799/plus/">(ブランディア)(wowma)</option>
-                                                        <option value="https://www.2ndstreet.jp/store">(セカンドストリートオンライン)(2ndstreet)</option>
-                                                        <option value="https://komehyo.jp/">(コメ兵)(komehyo)</option>
-                                                        <option value="https://jp.mercari.com/">(メルカリ)(mercari)</option>
-                                                        <option value="https://auctions.yahoo.co.jp/">(ヤフオク)(yahoo)</option>
-                                                        <option value="https://www.ecoauc.com/client">(エコリングオークション)(ecoauc)</option>
+                                                        <option value="wowma">(ブランディア)(wowma)</option>
+                                                        <option value="2ndstreet">(セカンドストリートオンライン)(2ndstreet)</option>
+                                                        <option value="komehyo">(コメ兵)(komehyo)</option>
+                                                        <option value="mercari">(メルカリ)(mercari)</option>
+                                                        <option value="yahoo">(ヤフオク)(yahoo)</option>
+                                                        <option value="ecoauc">(エコリングオークション)(ecoauc)</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -107,7 +107,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">いいえ</button>
-                                            <button type="button" class="btn btn-primary">追加する</button>
+                                            <button type="button" class="btn btn-primary" id="addButton">追加する</button>
                                         </div>
                                     </div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->
@@ -159,6 +159,10 @@
                 }
             });
             
+        })
+
+        $("#addButton").on('click', function() {
+            $("#storeForm").submit();
         })
     });
 </script>

@@ -108,7 +108,7 @@ class NotificationController extends Controller
                 'user' => 39095799,
                 'x' => 0,
                 'y' => 0,
-                'page' => 9,
+                'page' => 0,
                 'uads' => 0,
                 'acc_filter' => 'N',
                 'shop_only' => 'Y',
