@@ -131,7 +131,6 @@
 <script>
     $( document ).ready(function() {
         $('#preview').on('click',function() {
-            $("#loading").show();
             $('#search_results').children().remove();
             var keyword = $("#keyword").val();
             var lower_price = $("#lower_price").val();
@@ -152,7 +151,7 @@
                     status:status,
                     _token: '{{csrf_token()}}'},
                 success:function(results){
-                    $("#loading").hide();
+                    $("#loading").remove();
                     $('#search_results').append(results);
                         
                 }
