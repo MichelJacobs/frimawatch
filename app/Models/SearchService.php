@@ -5,10 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SearchExculdedService extends Model
+class SearchService extends Model
 {
     use HasFactory;
     protected $table = 'search_services';
+
+    protected $fillable = [
+        'search_id',
+        'service',
+    ];
 
     public function search()
     {

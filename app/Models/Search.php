@@ -25,14 +25,9 @@ class Search extends Model
         'status',
     ];
 
-    public function excluded_words()
+    public function services()
     {
-        return $this->hasMany(SearchExculdedWord::class);
-    }
-
-    public function excluded_services()
-    {
-        return $this->hasMany(SearchExculdedService::class);
+        return $this->hasMany(SearchService::class);
     }
     
 }

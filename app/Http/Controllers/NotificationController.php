@@ -125,7 +125,7 @@ class NotificationController extends Controller
                     $hitItems = $response->object()->hitItems;
                     foreach($hitItems as $item) {
                         if($this->count > 5) break;
-                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
                             array_push($this->results, [
                                 'currentPrice' => $item->currentPrice,
                                 'itemImageUrl' => $item->itemImageUrl,
