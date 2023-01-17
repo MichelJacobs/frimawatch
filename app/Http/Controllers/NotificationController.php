@@ -291,7 +291,7 @@ class NotificationController extends Controller
             $str = '';
             if(count($this->results) > 0) {
                 foreach($this->results as $item) {
-                    $str .= '<div class="col-xl-12 col-md-12">
+                    $str .= '<div class="col-xl-12 col-md-12 mt-1">
                                 <a href="'.$item['url'].'" target="_blank">
                                 <div class="d-flex">
                                     <div style="width:100px;height:100px;">
