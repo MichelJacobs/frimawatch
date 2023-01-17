@@ -21,6 +21,12 @@ class NotificationController extends Controller
         'https://auctions.yahoo.co.jp/',
         'https://www.ecoauc.com/client',
     ];
+
+    protected $results = [];
+    protected $count = 1;
+    protected $lower_price;
+    protected $upper_price;
+    protected $excluded_word;
     /**
      * Display a listing of the resource.
      *
@@ -85,75 +91,206 @@ class NotificationController extends Controller
     public function scrape(Request $request) 
     {
         $keyword = $request->get('keyword');
-        $lower_price = $request->get('lower_price');
-        $upper_price = $request->get('upper_price');
-        $excluded_word = $request->get('excluded_word');
+        $this->lower_price = $request->get('lower_price');
+        $this->upper_price = $request->get('upper_price');
+        $this->excluded_word = $request->get('excluded_word');
         $services = $request->get('services');
         $status = $request->get('status');
 
-        $results = [];
-        $count = 1;
-        
         foreach($services as $service) {
-            // $client = new Client(HttpClient::create(['timeout' => 60]));
-            // $serviceIndex = 'none';
-            // if(str_contains($service, 'wowma')) {
-            //     $serviceIndex = 'wowma';
-            // }else if()
-            if($count > 5) break;
-            $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-            $totalPages = 10;
+            
+            if($this->count > 5) break;
+            if (str_contains($service, 'wowma')) {
+                $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                $totalPages = 1;
 
-            for($i = 0; $i < $totalPages; $i++) {
-                if($count > 5) break;
-                $response = Http::get('https://wowma.jp/catalog/api/search/items', [
-                    'keyword' => $new,
-                    'e_scope' => 'O',
-                    'user' => 39095799,
-                    'x' => 0,
-                    'y' => 0,
-                    'page' => $i,
-                    'uads' => 0,
-                    'acc_filter' => 'N',
-                    'shop_only' => 'Y',
-                    'ref_id' => 'catalog_klist2',
-                    'mode' => 'pc',
-                ]);
-                if($i == 0) {
-                    $totalPages = $response->object()->pageInformation->totalPages;
-                }
-                $hitItems = $response->object()->hitItems;
-                foreach($hitItems as $item) {
-                    if($count > 5) break;
-                    if(isset($lower_price) && isset($upper_price)){
-                        if(($item->currentPrice >= $lower_price) && ($item->currentPrice <= $upper_price)){
-                            array_push($results, [
+                for($i = 0; $i < $totalPages; $i++) {
+                    if($this->count > 5) break;
+                    $response = Http::get('https://wowma.jp/catalog/api/search/items', [
+                        'keyword' => $new,
+                        'e_scope' => 'O',
+                        'user' => 39095799,
+                        'x' => 0,
+                        'y' => 0,
+                        'page' => $i,
+                        'uads' => 0,
+                        'acc_filter' => 'N',
+                        'shop_only' => 'Y',
+                        'ref_id' => 'catalog_klist2',
+                        'mode' => 'pc',
+                    ]);
+                    if($i == 0) {
+                        $totalPages = $response->object()->pageInformation->totalPages;
+                    }
+                    $hitItems = $response->object()->hitItems;
+                    foreach($hitItems as $item) {
+                        if($this->count > 5) break;
+                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                            array_push($this->results, [
                                 'currentPrice' => $item->currentPrice,
                                 'itemImageUrl' => $item->itemImageUrl,
                                 'itemName' => $item->itemName,
+                                'url' => $item->url,
+                                'service' => 'wowma',
                             ]);
-                            $count++;
+                            $this->count++;
                         }
-                    }else{
-                        array_push($results, [
-                            'currentPrice' => $item->currentPrice,
-                            'itemImageUrl' => $item->itemImageUrl,
-                            'itemName' => $item->itemName,
-                        ]);
-                        $count++;
                     }
                 }
             }
 
-            //2ndstreet
-            // $response = Http::get('https://www.2ndstreet.jp/searchapi/getCount', [
-            //     'keyword' => $keyword,
-            //     '_' => 1673854048585,
-            // ]);
-            // $pages = $response->object();
+            if (str_contains($service, '2ndstreet')) {
+                $client = new Client();
+                $pages = 0;
+                // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                for ($i = 0; $i < $pages + 1; $i++) {
+                    if($this->count > 5) break;
+                    if($i == 0 ){
+                        $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
+                        $crawler = $client->request('GET', $url);
+                        $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
+                            ? $crawler->filter('nav.ecPager li:nth-last-child(2)')->text()
+                            : 0
+                        ;
+                    }else {
+                        $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
+                        $crawler = $client->request('GET', $url);
+                    }
+                    $crawler->filter('.js-favorite')->each(function ($node) {
+                        if($this->count > 5) return false;
+                        $url = $node->filter('a.listLink')->attr('href');
+                        $itemImageUrl = $node->filter('.imgBlock img')->attr('data-src');
+                        $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.price')->text()), 10);
+                        $itemName   = $node->filter('.name-goods')->text();
+
+                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                            array_push($this->results, [
+                                'currentPrice' => $currentPrice,
+                                'itemImageUrl' => $itemImageUrl,
+                                'itemName' => $itemName,
+                                'url' => $url,
+                                'service' => '2ndstreet',
+                            ]);
+                            $this->count++;
+                        }
+                    });
+                }
+            }
+
+            if (str_contains($service, 'komehyo')) {
+                $client = new Client();
+                $pages = 1;
+                // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                for ($i = 1; $i < $pages + 1; $i++) {
+                    if($this->count > 5) break;
+                    if($i == 1 ){
+                        $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
+                        $crawler = $client->request('GET', $url);
+                        $pages = ($crawler->filter('.p-pager li')->count() > 0)
+                            ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
+                            : 1
+                        ;
+                    }else {
+                        $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
+                        $crawler = $client->request('GET', $url);
+                    }
+                    $crawler->filter('.p-lists__item')->each(function ($node) {
+                        if($this->count > 5) return false;
+                        $url = $node->filter('a.p-link')->attr('href');
+                        $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
+                        $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
+                        $itemName   = $node->filter('.p-link__txt--productsname')->text();
+                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                            array_push($this->results, [
+                                'currentPrice' => $currentPrice,
+                                'itemImageUrl' => $itemImageUrl,
+                                'itemName' => $itemName,
+                                'url' => $url,
+                                'service' => 'komehyo',
+                            ]);
+                            $this->count++;
+                        }
+                        
+                    });
+                }
+            }
+
+            if (str_contains($service, 'mercari')) {
+                $client = new Client();
+                $pages = 0;
+                for ($i = 0; ; $i++) {
+                    if($this->count > 5) break;
+                    $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
+                    $crawler = $client->request('GET', $url);
+                    if($crawler->filter('#item-grid li')->count() > 0) {
+                        $crawler->filter('#item-grid li')->each(function ($node) {
+                            if($this->count > 5) return false;
+                            $url = $node->filter('a')->attr('href');
+                            $itemImageUrl = $node->filter('img')->attr('src');
+                            $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.number')->text()), 10);
+                            $itemName   = $node->filter('.item-name')->text();
+                            if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                array_push($this->results, [
+                                    'currentPrice' => $currentPrice,
+                                    'itemImageUrl' => $itemImageUrl,
+                                    'itemName' => $itemName,
+                                    'url' => $url,
+                                    'service' => 'komehyo',
+                                ]);
+                                $this->count++;
+                            }
+                            
+                        });
+                    }else{
+                        break;
+                    }
+                    
+                }
+                dd($this->results);
+            }
+
+            // if (str_contains($service, 'yahoo')) {
+            //     $client = new Client();
+            //     $pages = 1;
+            //     // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+            //     for ($i = 1; $i < $pages + 1; $i++) {
+            //         if($this->count > 5) break;
+            //         if($i == 1 ){
+            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
+            //             $crawler = $client->request('GET', $url);
+            //             $pages = ($crawler->filter('.p-pager li')->count() > 0)
+            //                 ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
+            //                 : 1
+            //             ;
+            //         }else {
+            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
+            //             $crawler = $client->request('GET', $url);
+            //         }
+            //         $crawler->filter('.p-lists__item')->each(function ($node) {
+            //             if($this->count > 5) return false;
+            //             $url = $node->filter('a.p-link')->attr('href');
+            //             $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
+            //             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
+            //             $itemName   = $node->filter('.p-link__txt--productsname')->text();
+            //             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+            //                 array_push($this->results, [
+            //                     'currentPrice' => $currentPrice,
+            //                     'itemImageUrl' => $itemImageUrl,
+            //                     'itemName' => $itemName,
+            //                     'url' => $url,
+            //                     'service' => 'komehyo',
+            //                 ]);
+            //                 $this->count++;
+            //             }
+                        
+            //         });
+            //     }
+            // }
+
+            //result part
             $str = '';
-            if(count($results) > 0) {
-                foreach($results as $item) {
+            if(count($this->results) > 0) {
+                foreach($this->results as $item) {
                     $str .= '<div class="col-xl-12 col-md-12">
                                 <div class="d-flex">
                                     <div style="width:100px;height:100px;">
@@ -162,7 +299,7 @@ class NotificationController extends Controller
                                     <div class="col-xl-8 col-md-8 p-2">
                                         <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'円</h6>
                                         <p class="text-muted mb-0 font-13">'.$item['itemName'].'</p>
-                                        <p class="text-muted mb-0 font-13">wowma</p>
+                                        <p class="text-muted mb-0 font-13">'.$item['service'].'</p>
                                     </div>
                                 </div>
                             </div>';
@@ -171,34 +308,27 @@ class NotificationController extends Controller
                 $str = '<div class="text-center">一致する商品が見つかりません。</div>';
             }
             
-            // $str = 'シャツ';
-            // $keyword = mb_convert_encoding($str,"SJIS","auto");dd($keyword);
-            // $response = Http::get('https://wowma.jp/catalog/api/search/items?keyword='.$keyword.'&e_scope=O&user=39095799&x=0&y=0&page=9&uads=0&acc_filter=N&shop_only=Y&ref_id=catalog_klist2&mode=pc');
-            // $response = Http::get('https://www.2ndstreet.jp/searchapi/getCount?keyword=%E3%82%B7%E3%83%A3%E3%83%84&&_=1673577370938');
-
-            // $pages = $response->object()->pageInformation->totalCount;dd($pages);
-            // ($crawler->filter('searchListingPagination li')->count() > 0)
-            //     ? $crawler->filter('footer .pagination li:nth-last-child(2)')->text()
-            //     : 0
-            // ;
-    
-            // for ($i = 0; $i < $pages + 1; $i++) {
-            //     if ($i != 0) {
-            //         $crawler = Goutte::request('GET', env('FUNKO_POP_URL').'/'.$collection.'?page='.$i);
-            //     }
-    
-            //     $crawler->filter('.product-item')->each(function ($node) {
-            //         $sku   = explode('#', $node->filter('.product-sku')->text())[1];
-            //         $title = trim($node->filter('.title a')->text());
-    
-            //         print_r($sku.', '.$title);
-            //     });
-            // }
         }
 
         return $str;
     }
 
+    public function compareCondition($lower_price, $upper_price,$excluded_word, $currentPrice, $itemName ) {
+        $result = false;
+        $result = $lower_price ? ($currentPrice >= $lower_price) : true;
+        if($result) {
+            $result = $upper_price ? ($currentPrice <= $upper_price) : true;
+            if($result) {
+                if(isset($excluded_word)) {
+                    $words = explode(';',$excluded_word);
+                    foreach($words as $word) {
+                        if(str_contains($itemName, $word))$result = false;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
     /**
      * Display the specified resource.
      *
