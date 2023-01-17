@@ -281,6 +281,7 @@ class SearchController extends Controller
             if(count($this->results) > 0) {
                 foreach($this->results as $item) {
                     $str .= '<div class="col-xl-12 col-md-12">
+                                <a href="'.$item['url'].'" target="_blank">
                                 <div class="d-flex">
                                     <div style="width:100px;height:100px;">
                                         <img src="'.$item['itemImageUrl'].'" class="img-fluid" alt="result">
@@ -291,6 +292,7 @@ class SearchController extends Controller
                                         <p class="text-muted mb-0 font-13">'.$item['service'].'</p>
                                     </div>
                                 </div>
+                                </a>
                             </div>';
                 }
             }else{
