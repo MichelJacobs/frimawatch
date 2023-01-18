@@ -100,7 +100,7 @@ class SendNotification extends Command
                                     $content .= $user->name.' 様'.'<br>';
                                     $content .= '商品があります。'.'<br>';
                                     $content .= '商品名　'.$item->itemName.'<br>';
-                                    $content .= '商品価格　'.$item->currentPrice.'<br>';
+                                    $content .= '商品価格　'.$item->currentPrice.'円<br>';
                                     $content .= '商品サービス　wowma'.'<br>';
                                     $content .= '商品ページ '.$item->url.'<br>';
                                     $this->sendEmail($content,$item->url, $user);
@@ -139,7 +139,7 @@ class SendNotification extends Command
                                     $content .= $this->user->name.' 様'.'<br>';
                                     $content .= '商品があります。'.'<br>';
                                     $content .= '商品名　'.$itemName.'<br>';
-                                    $content .= '商品価格　'.$currentPrice.'<br>';
+                                    $content .= '商品価格　'.$currentPrice.'円<br>';
                                     $content .= '商品サービス　2ndstreet'.'<br>';
                                     $content .= '商品ページ https://www.2ndstreet.jp'.$url.'<br>';
                                     $this->sendEmail($content,$url, $this->user);
@@ -177,7 +177,7 @@ class SendNotification extends Command
                                     $content .= $this->user->name.' 様'.'<br>';
                                     $content .= '商品があります。'.'<br>';
                                     $content .= '商品名　'.$itemName.'<br>';
-                                    $content .= '商品価格　'.$currentPrice.'<br>';
+                                    $content .= '商品価格　'.$currentPrice.'円<br>';
                                     $content .= '商品サービス　komehyo'.'<br>';
                                     $content .= '商品ページ https://komehyo.jp'.$url.'<br>';
                                     $this->sendEmail($content,$url, $this->user);
