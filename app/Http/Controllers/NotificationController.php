@@ -322,7 +322,7 @@ class NotificationController extends Controller
             $result = $upper_price ? ($currentPrice <= $upper_price) : true;
             if($result) {
                 if(isset($excluded_word)) {
-                    $words = explode(';',$excluded_word);
+                    $words = explode(' ',$excluded_word);
                     foreach($words as $word) {
                         if(str_contains($itemName, $word))$result = false;
                     }

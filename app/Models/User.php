@@ -45,7 +45,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function notifications(): HasMany
+    public function notifications()
     {
         return $this->hasMany(Notification::class);
     }
