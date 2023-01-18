@@ -13,14 +13,7 @@ use Illuminate\Support\Facades\Http;
 class NotificationController extends Controller
 {
 
-    protected $services = [
-        'https://plus.wowma.jp/user/39095799/plus/',
-        'https://www.2ndstreet.jp/store',
-        'https://komehyo.jp/',
-        'https://jp.mercari.com/',
-        'https://auctions.yahoo.co.jp/',
-        'https://www.ecoauc.com/client',
-    ];
+    public const TOTAL_COUNT = 50;
 
     protected $results = [];
     protected $count = 1;
@@ -62,7 +55,6 @@ class NotificationController extends Controller
         //
         $user = auth()->user();
         $notification = new Notification();
-
         $notification->fill([
             "user_id" => $user->id,
             "keyword" => $request->get('keyword'),
@@ -74,12 +66,12 @@ class NotificationController extends Controller
 
         $notification->save();
 
-        foreach($request->get('services') as $service) {
+        foreach($request->get('services') as $key => $service) {
 
             $notificationService = new NotificationService();
             $notificationService->fill([
                 "notification_id" => $notification->id,
-                "service" => $service,
+                "service" => $key,
             ]);
 
             $notificationService->save();
@@ -99,13 +91,13 @@ class NotificationController extends Controller
 
         foreach($services as $service) {
             
-            if($this->count > 5) break;
+            if($this->count > self::TOTAL_COUNT) break;
             if (str_contains($service, 'wowma')) {
                 $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 $totalPages = 1;
 
                 for($i = 0; $i < $totalPages; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     $response = Http::get('https://wowma.jp/catalog/api/search/items', [
                         'keyword' => $new,
                         'e_scope' => 'O',
@@ -124,7 +116,7 @@ class NotificationController extends Controller
                     }
                     $hitItems = $response->object()->hitItems;
                     foreach($hitItems as $item) {
-                        if($this->count > 5) break;
+                        if($this->count > self::TOTAL_COUNT) break;
                         if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
                             array_push($this->results, [
                                 'currentPrice' => $item->currentPrice,
@@ -144,20 +136,25 @@ class NotificationController extends Controller
                 $pages = 0;
                 // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 for ($i = 0; $i < $pages + 1; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     if($i == 0 ){
                         $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
                         $crawler = $client->request('GET', $url);
-                        $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
+                        try {
+                            $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
                             ? $crawler->filter('nav.ecPager li:nth-last-child(2)')->text()
                             : 0
                         ;
+                        }catch(\Throwable  $e){
+                            $pages = 0;break;
+                        }
+                        
                     }else {
                         $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
                     $crawler->filter('.js-favorite')->each(function ($node) {
-                        if($this->count > 5) return false;
+                        if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a.listLink')->attr('href');
                         $itemImageUrl = $node->filter('.imgBlock img')->attr('data-src');
                         $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.price')->text()), 10);
@@ -168,12 +165,13 @@ class NotificationController extends Controller
                                 'currentPrice' => $currentPrice,
                                 'itemImageUrl' => $itemImageUrl,
                                 'itemName' => $itemName,
-                                'url' => $url,
+                                'url' => 'https://www.2ndstreet.jp'.$url,
                                 'service' => '2ndstreet',
                             ]);
                             $this->count++;
                         }
                     });
+                    
                 }
             }
 
@@ -182,20 +180,26 @@ class NotificationController extends Controller
                 $pages = 1;
                 // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 for ($i = 1; $i < $pages + 1; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     if($i == 1 ){
                         $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
                         $crawler = $client->request('GET', $url);
-                        $pages = ($crawler->filter('.p-pager li')->count() > 0)
+                        try {
+                            $pages = ($crawler->filter('.p-pager li')->count() > 0)
                             ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
-                            : 1
+                            : 0
                         ;
+                        if($pages == 0) break;
+                        }catch(\Throwable  $e){
+                            $pages = 1;break;
+                        }
+                        
                     }else {
                         $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
                     $crawler->filter('.p-lists__item')->each(function ($node) {
-                        if($this->count > 5) return false;
+                        if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a.p-link')->attr('href');
                         $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
                         $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
@@ -205,12 +209,11 @@ class NotificationController extends Controller
                                 'currentPrice' => $currentPrice,
                                 'itemImageUrl' => $itemImageUrl,
                                 'itemName' => $itemName,
-                                'url' => $url,
+                                'url' => 'https://komehyo.jp'.$url,
                                 'service' => 'komehyo',
                             ]);
                             $this->count++;
                         }
-                        
                     });
                 }
             }
@@ -219,12 +222,12 @@ class NotificationController extends Controller
                 $client = new Client();
                 $pages = 0;
                 for ($i = 0; ; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
                     $crawler = $client->request('GET', $url);
                     if($crawler->filter('#item-grid li')->count() > 0) {
                         $crawler->filter('#item-grid li')->each(function ($node) {
-                            if($this->count > 5) return false;
+                            if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a')->attr('href');
                             $itemImageUrl = $node->filter('img')->attr('src');
                             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.number')->text()), 10);
@@ -246,49 +249,12 @@ class NotificationController extends Controller
                     }
                     
                 }
-                dd($this->results);
             }
 
-            // if (str_contains($service, 'yahoo')) {
-            //     $client = new Client();
-            //     $pages = 1;
-            //     // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-            //     for ($i = 1; $i < $pages + 1; $i++) {
-            //         if($this->count > 5) break;
-            //         if($i == 1 ){
-            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
-            //             $crawler = $client->request('GET', $url);
-            //             $pages = ($crawler->filter('.p-pager li')->count() > 0)
-            //                 ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
-            //                 : 1
-            //             ;
-            //         }else {
-            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
-            //             $crawler = $client->request('GET', $url);
-            //         }
-            //         $crawler->filter('.p-lists__item')->each(function ($node) {
-            //             if($this->count > 5) return false;
-            //             $url = $node->filter('a.p-link')->attr('href');
-            //             $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
-            //             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
-            //             $itemName   = $node->filter('.p-link__txt--productsname')->text();
-            //             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-            //                 array_push($this->results, [
-            //                     'currentPrice' => $currentPrice,
-            //                     'itemImageUrl' => $itemImageUrl,
-            //                     'itemName' => $itemName,
-            //                     'url' => $url,
-            //                     'service' => 'komehyo',
-            //                 ]);
-            //                 $this->count++;
-            //             }
-                        
-            //         });
-            //     }
-            // }
-
             //result part
-            $str = '';
+            $str = '<div class="col-xl-12 col-md-12 mt-1">
+                        <h4 class="mt-0 mb-1 text-danger" style="text-align:center;">ヒット件数 : '.count($this->results).'件</h4>
+                    </div>';
             if(count($this->results) > 0) {
                 foreach($this->results as $item) {
                     $str .= '<div class="col-xl-12 col-md-12 mt-1">
@@ -307,7 +273,7 @@ class NotificationController extends Controller
                             </div>';
                 }
             }else{
-                $str = '<div class="text-center">一致する商品が見つかりません。</div>';
+                $str .= '<div class="text-center">一致する商品が見つかりません。</div>';
             }
             
         }
@@ -341,8 +307,11 @@ class NotificationController extends Controller
     {
         //
         $notification = Notification::where('id',$id)->first();
-
-        return view('notifications.show',compact('notification'));
+        $services = [];
+        foreach($notification->services as $service){
+            array_push($services, $service->service);
+        }
+        return view('notifications.show',compact('notification','services'));
     }
 
     /**
@@ -366,6 +335,28 @@ class NotificationController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $user = auth()->user();
+        $notification = new Notification();
+
+        Notification::where('id', $id)
+            ->update([
+                "keyword" => $request->get('keyword'),
+                "lower_price" => $request->get('lower_price'),
+                "upper_price" => $request->get('upper_price'),
+                "excluded_words" => $request->get('excluded_word'),
+                "status" => $request->get('status')
+            ]);
+
+        NotificationService::where('notification_id', $id)->delete();
+        foreach($request->get('services') as $key => $service) {
+
+            NotificationService::Create(
+                ["notification_id" => $id,"service" => $key,]
+            );
+
+        }
+
+        return redirect()->action([NotificationController::class, 'index']);
     }
 
     /**

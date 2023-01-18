@@ -17,18 +17,26 @@ class SearchController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public const TOTAL_COUNT = 50;
+
+    protected $results = [];
+    protected $count = 1;
+    protected $lower_price;
+    protected $upper_price;
+    protected $excluded_word;
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         //
         $searchs = Search::where('user_id',auth()->user()->id)->get();
+
         return view('searchs.index',compact('searchs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     /**
      * Show the form for creating a new resource.
      *
@@ -51,7 +59,6 @@ class SearchController extends Controller
         //
         $user = auth()->user();
         $search = new Search();
-
         $search->fill([
             "user_id" => $user->id,
             "keyword" => $request->get('keyword'),
@@ -63,12 +70,12 @@ class SearchController extends Controller
 
         $search->save();
 
-        foreach($request->get('services') as $service) {
+        foreach($request->get('services') as $key => $service) {
 
             $searchService = new SearchService();
             $searchService->fill([
                 "search_id" => $search->id,
-                "service" => $service,
+                "service" => $key,
             ]);
 
             $searchService->save();
@@ -88,13 +95,13 @@ class SearchController extends Controller
 
         foreach($services as $service) {
             
-            if($this->count > 5) break;
+            if($this->count > self::TOTAL_COUNT) break;
             if (str_contains($service, 'wowma')) {
                 $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 $totalPages = 1;
 
                 for($i = 0; $i < $totalPages; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     $response = Http::get('https://wowma.jp/catalog/api/search/items', [
                         'keyword' => $new,
                         'e_scope' => 'O',
@@ -113,7 +120,7 @@ class SearchController extends Controller
                     }
                     $hitItems = $response->object()->hitItems;
                     foreach($hitItems as $item) {
-                        if($this->count > 5) break;
+                        if($this->count > self::TOTAL_COUNT) break;
                         if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
                             array_push($this->results, [
                                 'currentPrice' => $item->currentPrice,
@@ -133,20 +140,25 @@ class SearchController extends Controller
                 $pages = 0;
                 // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 for ($i = 0; $i < $pages + 1; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     if($i == 0 ){
                         $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
                         $crawler = $client->request('GET', $url);
-                        $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
+                        try {
+                            $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
                             ? $crawler->filter('nav.ecPager li:nth-last-child(2)')->text()
                             : 0
                         ;
+                        }catch(\Throwable  $e){
+                            $pages = 0;break;
+                        }
+                        
                     }else {
                         $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
                     $crawler->filter('.js-favorite')->each(function ($node) {
-                        if($this->count > 5) return false;
+                        if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a.listLink')->attr('href');
                         $itemImageUrl = $node->filter('.imgBlock img')->attr('data-src');
                         $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.price')->text()), 10);
@@ -157,12 +169,13 @@ class SearchController extends Controller
                                 'currentPrice' => $currentPrice,
                                 'itemImageUrl' => $itemImageUrl,
                                 'itemName' => $itemName,
-                                'url' => $url,
+                                'url' => 'https://www.2ndstreet.jp'.$url,
                                 'service' => '2ndstreet',
                             ]);
                             $this->count++;
                         }
                     });
+                    
                 }
             }
 
@@ -171,20 +184,26 @@ class SearchController extends Controller
                 $pages = 1;
                 // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
                 for ($i = 1; $i < $pages + 1; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     if($i == 1 ){
                         $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
                         $crawler = $client->request('GET', $url);
-                        $pages = ($crawler->filter('.p-pager li')->count() > 0)
+                        try {
+                            $pages = ($crawler->filter('.p-pager li')->count() > 0)
                             ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
-                            : 1
+                            : 0
                         ;
+                        if($pages == 0) break;
+                        }catch(\Throwable  $e){
+                            $pages = 1;break;
+                        }
+                        
                     }else {
                         $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
                     $crawler->filter('.p-lists__item')->each(function ($node) {
-                        if($this->count > 5) return false;
+                        if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a.p-link')->attr('href');
                         $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
                         $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
@@ -194,12 +213,11 @@ class SearchController extends Controller
                                 'currentPrice' => $currentPrice,
                                 'itemImageUrl' => $itemImageUrl,
                                 'itemName' => $itemName,
-                                'url' => $url,
+                                'url' => 'https://komehyo.jp'.$url,
                                 'service' => 'komehyo',
                             ]);
                             $this->count++;
                         }
-                        
                     });
                 }
             }
@@ -208,12 +226,12 @@ class SearchController extends Controller
                 $client = new Client();
                 $pages = 0;
                 for ($i = 0; ; $i++) {
-                    if($this->count > 5) break;
+                    if($this->count > self::TOTAL_COUNT) break;
                     $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
                     $crawler = $client->request('GET', $url);
                     if($crawler->filter('#item-grid li')->count() > 0) {
                         $crawler->filter('#item-grid li')->each(function ($node) {
-                            if($this->count > 5) return false;
+                            if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a')->attr('href');
                             $itemImageUrl = $node->filter('img')->attr('src');
                             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.number')->text()), 10);
@@ -235,52 +253,15 @@ class SearchController extends Controller
                     }
                     
                 }
-                dd($this->results);
             }
 
-            // if (str_contains($service, 'yahoo')) {
-            //     $client = new Client();
-            //     $pages = 1;
-            //     // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-            //     for ($i = 1; $i < $pages + 1; $i++) {
-            //         if($this->count > 5) break;
-            //         if($i == 1 ){
-            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=1";
-            //             $crawler = $client->request('GET', $url);
-            //             $pages = ($crawler->filter('.p-pager li')->count() > 0)
-            //                 ? $crawler->filter('.p-pager li:nth-last-child(2)')->text()
-            //                 : 1
-            //             ;
-            //         }else {
-            //             $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
-            //             $crawler = $client->request('GET', $url);
-            //         }
-            //         $crawler->filter('.p-lists__item')->each(function ($node) {
-            //             if($this->count > 5) return false;
-            //             $url = $node->filter('a.p-link')->attr('href');
-            //             $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
-            //             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
-            //             $itemName   = $node->filter('.p-link__txt--productsname')->text();
-            //             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-            //                 array_push($this->results, [
-            //                     'currentPrice' => $currentPrice,
-            //                     'itemImageUrl' => $itemImageUrl,
-            //                     'itemName' => $itemName,
-            //                     'url' => $url,
-            //                     'service' => 'komehyo',
-            //                 ]);
-            //                 $this->count++;
-            //             }
-                        
-            //         });
-            //     }
-            // }
-
             //result part
-            $str = '';
+            $str = '<div class="col-xl-12 col-md-12 mt-1">
+                        <h4 class="mt-0 mb-1 text-danger" style="text-align:center;">ヒット件数 : '.count($this->results).'件</h4>
+                    </div>';
             if(count($this->results) > 0) {
                 foreach($this->results as $item) {
-                    $str .= '<div class="col-xl-12 col-md-12">
+                    $str .= '<div class="col-xl-12 col-md-12 mt-1">
                                 <a href="'.$item['url'].'" target="_blank">
                                 <div class="d-flex">
                                     <div style="width:100px;height:100px;">
@@ -296,7 +277,7 @@ class SearchController extends Controller
                             </div>';
                 }
             }else{
-                $str = '<div class="text-center">一致する商品が見つかりません。</div>';
+                $str .= '<div class="text-center">一致する商品が見つかりません。</div>';
             }
             
         }
@@ -330,8 +311,11 @@ class SearchController extends Controller
     {
         //
         $search = Search::where('id',$id)->first();
-
-        return view('searchs.show',compact('search'));
+        $services = [];
+        foreach($search->services as $service){
+            array_push($services, $service->service);
+        }
+        return view('searchs.show',compact('search','services'));
     }
 
     /**
@@ -355,6 +339,28 @@ class SearchController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $user = auth()->user();
+        $search = new Search();
+
+        Search::where('id', $id)
+            ->update([
+                "keyword" => $request->get('keyword'),
+                "lower_price" => $request->get('lower_price'),
+                "upper_price" => $request->get('upper_price'),
+                "excluded_words" => $request->get('excluded_word'),
+                "status" => $request->get('status')
+            ]);
+
+        SearchService::where('search_id', $id)->delete();
+        foreach($request->get('services') as $key => $service) {
+
+            SearchService::Create(
+                ["search_id" => $id,"service" => $key,]
+            );
+
+        }
+
+        return redirect()->action([SearchController::class, 'index']);
     }
 
     /**

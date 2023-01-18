@@ -66,7 +66,7 @@
                                             </td>
                                             <td>{{$notification->status}}</td>
                                             <td>
-                                                {{-- <a href="{{ route('notification.show', $notification->id) }}" class="btn btn-sm btn-block btn-primary mt-1">詳細</a> --}}
+                                                <a href="{{ route('notification.show', $notification->id) }}" class="btn btn-sm btn-block btn-primary mt-1">編集</a>
                                                 <form action="{{ route('notification.destroy',$notification)}}" method="post">
                                                     <input type="hidden" name="_method" value="delete" />
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">

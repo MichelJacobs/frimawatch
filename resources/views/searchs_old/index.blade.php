@@ -7,19 +7,7 @@
         <!-- Start Content-->
         <div class="container-fluid">
 
-            <div class="row mt-3">
-                <div class="col-12">
-                    @foreach (['info', 'success', 'danger', 'warning'] as $msg)
-                        @if (Session::has('system.message.' . $msg))
-                            <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                {{ Session::get('system.message.' . $msg) }}
-                            </div>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-
+            
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -37,7 +25,7 @@
                         <div class="card-body">
                             <div class="row table-responsive">
                                 <div class="button-list text-end">
-                                    <a href="{{route('search.create')}}" class="btn btn-sm btn-primary mr-3 mb-3 btn-done">新しいアラートを作る</a>
+                                    <a href="{{route('search.create')}}" class="btn btn-sm btn-primary mr-3 mb-3 btn-done">新しい検索</a>
                                 </div>
                                 
                                 <table class="table table-striped">
@@ -66,7 +54,7 @@
                                             </td>
                                             <td>{{$search->status}}</td>
                                             <td>
-                                                <a href="{{ route('search.show', $search->id) }}" class="btn btn-sm btn-block btn-primary mt-1">編集</a>
+                                                {{-- <a href="{{ route('search.show', $search->id) }}" class="btn btn-sm btn-block btn-primary mt-1">詳細</a> --}}
                                                 <form action="{{ route('search.destroy',$search)}}" method="post">
                                                     <input type="hidden" name="_method" value="delete" />
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">

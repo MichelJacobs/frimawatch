@@ -11,7 +11,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box page-title-box-alt">
-                        <h4 class="page-title">アラート条件</h4>
+                        <h4 class="page-title">検索条件</h4>
                     </div>
                 </div>
             </div>     
@@ -26,12 +26,12 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="p-2">
-                                        <form method="POST" action="{{route('notification.store')}}" class="form-horizontal" role="form" id="storeForm">
+                                        <form method="POST" action="{{route('search.store')}}" class="form-horizontal" role="form" id="storeForm">
                                             @csrf
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="keyword">キーワード</label>
                                                 <div class="col-md-10">
-                                                    <input type="text" name="keyword" id="keyword" class="form-control" value="" placeholder="スペースで区切ります。" required>
+                                                    <input type="text" name="keyword" id="keyword" class="form-control" value="" required>
                                                 </div>
                                             </div>
 
@@ -59,30 +59,14 @@
                                             <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label">対象のサービス</label>
                                                 <div class="col-md-10">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="wowma" name="services[wowma]">
-                                                        <label class="form-check-label" for="wowma">(ブランディア)(wowma)</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="2ndstreet" name="services[2ndstreet]">
-                                                        <label class="form-check-label" for="2ndstreet">(セカンドストリートオンライン)(2ndstreet)</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="komehyo" name="services[komehyo]">
-                                                        <label class="form-check-label" for="komehyo">(コメ兵)(komehyo)</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="mercari" name="services[mercari]">
-                                                        <label class="form-check-label" for="mercari">(メルカリ)(mercari)</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="yahoo" name="services[yahoo]">
-                                                        <label class="form-check-label" for="yahoo">(ヤフオク)(yahoo)</label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="ecoauc" name="services[ecoauc]">
-                                                        <label class="form-check-label" for="ecoauc">(エコリングオークション)(ecoauc)</label>
-                                                    </div>
+                                                    <select multiple="multiple" name="services[]" id="services" class="form-control" required>
+                                                        <option value="wowma">(ブランディア)(wowma)</option>
+                                                        <option value="2ndstreet">(セカンドストリートオンライン)(2ndstreet)</option>
+                                                        <option value="komehyo">(コメ兵)(komehyo)</option>
+                                                        <option value="mercari">(メルカリ)(mercari)</option>
+                                                        <option value="yahoo">(ヤフオク)(yahoo)</option>
+                                                        <option value="ecoauc">(エコリングオークション)(ecoauc)</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
@@ -153,25 +137,7 @@
             var lower_price = $("#lower_price").val();
             var upper_price = $("#upper_price").val();
             var excluded_word = $("#excluded_word").val();
-            var services = [];
-            if($("#wowma").is(':checked')){
-                services.push('wowma');
-            }
-            if($("#2ndstreet").is(':checked')){
-                services.push('2ndstreet');
-            }
-            if($("#komehyo").is(':checked')){
-                services.push('komehyo');
-            }
-            if($("#mercari").is(':checked')){
-                services.push('mercari');
-            }
-            if($("#yahoo").is(':checked')){
-                services.push('yahoo');
-            }
-            if($("#ecoauc").is(':checked')){
-                services.push('ecoauc');
-            }
+            var services = $("#services").val();
             var status = $("#item_status").val();
             if(!keyword)alert("キーワードを入力してください。");
             if(services.length == 0)alert("対象のサービスを選択してください。");
