@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 class NotificationController extends Controller
 {
 
-    public const TOTAL_COUNT = 50;
+    public const TOTAL_COUNT = 10;
 
     protected $results = [];
     protected $count = 1;

@@ -17,7 +17,7 @@ class SearchController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public const TOTAL_COUNT = 50;
+    public const TOTAL_COUNT = 10;
 
     protected $results = [];
     protected $count = 1;
