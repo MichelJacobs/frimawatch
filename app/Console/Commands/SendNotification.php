@@ -241,7 +241,7 @@ class SendNotification extends Command
             // POSTデータ
             $data = [
                 "from" => [
-                        "email" => "yuuzi2006@gmail.com",
+                        "email" => "devlife128@gmail.com",
                         "name" => "frimawatch"
                 ],
                 "to" => $email,
