@@ -198,23 +198,33 @@ class NotificationController extends Controller
                         $url = "https://komehyo.jp/search/?q=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
-                    $crawler->filter('.p-lists__item')->each(function ($node) {
-                        if($this->count > self::TOTAL_COUNT) return false;
-                        $url = $node->filter('a.p-link')->attr('href');
-                        $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
-                        $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
-                        $itemName   = $node->filter('.p-link__txt--productsname')->text();
-                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-                            array_push($this->results, [
-                                'currentPrice' => $currentPrice,
-                                'itemImageUrl' => $itemImageUrl,
-                                'itemName' => $itemName,
-                                'url' => 'https://komehyo.jp'.$url,
-                                'service' => 'komehyo',
-                            ]);
-                            $this->count++;
-                        }
-                    });
+                    try {
+                        
+                        $crawler->filter('.p-lists__item')->each(function ($node) {
+                            if($this->count > self::TOTAL_COUNT) return false;
+                            $url = $node->filter('a.p-link')->attr('href');
+                            $itemStatus = $node->filter('.p-link__label')->text();
+                            if($status == $itemStatus) {
+                                $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
+                                $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
+                                $itemName   = $node->filter('.p-link__txt--productsname')->text();
+                                if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                    array_push($this->results, [
+                                        'currentPrice' => $currentPrice,
+                                        'itemImageUrl' => $itemImageUrl,
+                                        'itemName' => $itemName,
+                                        'url' => 'https://komehyo.jp'.$url,
+                                        'service' => 'komehyo',
+                                    ]);
+                                    $this->count++;
+                                }
+                            }
+                        });
+                    }catch(\Throwable  $e){
+                        dd($e->getMessage());
+                        continue;
+                    }
+                    
                 }
             }
 
