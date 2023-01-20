@@ -221,7 +221,6 @@ class NotificationController extends Controller
                             }
                         });
                     }catch(\Throwable  $e){
-                        dd($e->getMessage());
                         continue;
                     }
                     
