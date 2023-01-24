@@ -302,7 +302,7 @@ class NotificationController extends Controller
                     if($i == 1 ){
                         $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
                         
-                        $crawler = $client->request('GET', $url);dd($crawler);
+                        $crawler = $client->request('GET', $url);
                         try {
                             $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
                             ? $crawler->filter('.Pager__lists li:nth-last-child(2)')->text()
@@ -319,7 +319,7 @@ class NotificationController extends Controller
                         $crawler = $client->request('GET', $url);
                     }
                     try {
-                        
+                        dd($crawler->html());
                         $crawler->filter('.Product')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a.Product__imageLink')->attr('href');
@@ -337,6 +337,7 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
+                        
                     }catch(\Throwable  $e){
                         continue;
                     }
