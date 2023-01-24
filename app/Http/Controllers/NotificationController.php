@@ -327,7 +327,6 @@ class NotificationController extends Controller
                             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
                             $itemName   = $node->filter('.Product__title')->text();
                             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-                                dd("ok");
                                 array_push($this->results, [
                                     'currentPrice' => $currentPrice,
                                     'itemImageUrl' => $itemImageUrl,
@@ -338,7 +337,7 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
-                        dd($this->count);
+                        dd($this->results);
                         
                     }catch(\Throwable  $e){
                         continue;
