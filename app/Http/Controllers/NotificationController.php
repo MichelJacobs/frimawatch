@@ -314,8 +314,8 @@ class NotificationController extends Controller
                         }
                         
                     }else {
-                        $n = ($i - 1) * 50;dd("ok");
-                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=".(string)$n."&n=50";dd($url);
+                        $n = ($i - 1) * 50;
+                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=".(string)$n."&n=50";
                         $crawler = $client->request('GET', $url);
                     }
                     try {
@@ -337,7 +337,7 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
-                        
+                        dd($pages);
                     }catch(\Throwable  $e){
                         continue;
                     }
