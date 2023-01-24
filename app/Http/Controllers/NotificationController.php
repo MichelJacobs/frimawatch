@@ -314,8 +314,8 @@ class NotificationController extends Controller
                         }
                         
                     }else {
-                        $n = ($i - 1) * 50;
-                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=".(string)$n."&n=50";
+                        $n = ($i - 1) * 50;dd("ok");
+                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=".(string)$n."&n=50";dd($url);
                         $crawler = $client->request('GET', $url);
                     }
                     try {
