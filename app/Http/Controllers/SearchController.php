@@ -414,7 +414,7 @@ class SearchController extends Controller
                                     <div class="col-xl-8 col-md-8 p-2">
                                         <h6 class="mt-0 mb-1 text-danger">'.$item['currentPrice'].'円</h6>
                                         <p class="text-muted mb-0 font-13">'.$item['itemName'].'</p>
-                                        <p class="text-muted mb-0 font-13">'.$item['service'].'</p>
+                                        <p class="text-muted mb-0 font-13 text-danger">'.$item['service'].'</p>
                                     </div>
                                 </div>
                                 </a>
