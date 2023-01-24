@@ -170,8 +170,11 @@
             if($("#mercari").is(':checked')){
                 services.push('mercari');
             }
-            if($("#yahoo").is(':checked')){
-                services.push('yahoo');
+            if($("#yahooflat").is(':checked')){
+                services.push('yahooflat');
+            }
+            if($("#auction").is(':checked')){
+                services.push('auction');
             }
             if($("#ecoauc").is(':checked')){
                 services.push('ecoauc');
