@@ -320,13 +320,14 @@ class NotificationController extends Controller
                     }
                     try {
                         
-                        $crawler->filter('.Product')->each(function ($node) {dd($node->html());
+                        $crawler->filter('.Product')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a.Product__imageLink')->attr('href');
                             $itemImageUrl = $node->filter('.Product__imageData')->attr('src');
                             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
                             $itemName   = $node->filter('.Product__title')->text();
                             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                dd("ok");
                                 array_push($this->results, [
                                     'currentPrice' => $currentPrice,
                                     'itemImageUrl' => $itemImageUrl,
@@ -337,6 +338,7 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
+                        dd($this->count);
                         
                     }catch(\Throwable  $e){
                         continue;
