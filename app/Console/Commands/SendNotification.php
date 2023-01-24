@@ -29,12 +29,13 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 2;
+    public const SENT_COUNT = 25;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
     protected $excluded_word;
     protected $user;
+    protected $results = [];
 
     /**
      * Create a new command instance.
@@ -61,6 +62,7 @@ class SendNotification extends Command
             $notifications = $user->notifications;
             foreach($notifications as $notification) {
                 $this->count = 1;
+                $this->results = [];
                 $keyword = $notification->keyword;
                 $this->lower_price = $notification->lower_price;
                 $this->upper_price = $notification->upper_price;
@@ -96,14 +98,14 @@ class SendNotification extends Command
                             foreach($hitItems as $item) {
                                 if($this->count > self::SENT_COUNT) break;
                                 if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
-                                    $content = '';
-                                    $content .= $user->name.' 様'.'<br>';
-                                    $content .= '商品があります。'.'<br>';
-                                    $content .= '商品名　'.$item->itemName.'<br>';
-                                    $content .= '商品価格　'.$item->currentPrice.'円<br>';
-                                    $content .= '商品サービス　wowma'.'<br>';
-                                    $content .= '商品ページ '.$item->url.'<br>';
-                                    $this->sendEmail($content,$item->url, $user);
+                                    array_push($this->results, [
+                                        'currentPrice' => $item->currentPrice,
+                                        'itemImageUrl' => $item->itemImageUrl,
+                                        'itemName' => $item->itemName,
+                                        'url' => $item->url,
+                                        'service' => 'wowma',
+                                    ]);
+                                    $this->count++;
                                     
                                 }
                             }
@@ -135,15 +137,14 @@ class SendNotification extends Command
                                 $itemName   = $node->filter('.name-goods')->text();
 
                                 if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-                                    $content = '';
-                                    $content .= $this->user->name.' 様'.'<br>';
-                                    $content .= '商品があります。'.'<br>';
-                                    $content .= '商品名　'.$itemName.'<br>';
-                                    $content .= '商品価格　'.$currentPrice.'円<br>';
-                                    $content .= '商品サービス　2ndstreet'.'<br>';
-                                    $content .= '商品ページ https://www.2ndstreet.jp'.$url.'<br>';
-                                    $this->sendEmail($content,$url, $this->user);
-                                   
+                                    array_push($this->results, [
+                                        'currentPrice' => $currentPrice,
+                                        'itemImageUrl' => $itemImageUrl,
+                                        'itemName' => $itemName,
+                                        'url' => 'https://www.2ndstreet.jp'.$url,
+                                        'service' => '2ndstreet',
+                                    ]);
+                                    $this->count++;
                                 }
                             });
                         }
@@ -173,26 +174,104 @@ class SendNotification extends Command
                                 $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
                                 $itemName   = $node->filter('.p-link__txt--productsname')->text();
                                 if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-                                    $content = '';
-                                    $content .= $this->user->name.' 様'.'<br>';
-                                    $content .= '商品があります。'.'<br>';
-                                    $content .= '商品名　'.$itemName.'<br>';
-                                    $content .= '商品価格　'.$currentPrice.'円<br>';
-                                    $content .= '商品サービス　komehyo'.'<br>';
-                                    $content .= '商品ページ https://komehyo.jp'.$url.'<br>';
-                                    $this->sendEmail($content,$url, $this->user);
-                                    
+                                    array_push($this->results, [
+                                        'currentPrice' => $currentPrice,
+                                        'itemImageUrl' => $itemImageUrl,
+                                        'itemName' => $itemName,
+                                        'url' => 'https://komehyo.jp'.$url,
+                                        'service' => 'komehyo',
+                                    ]);
+                                    $this->count++;
                                 }
                                 
                             });
                         }
                     }
 
+                    if (str_contains($service, 'mercari')) {
+                        $client = new Client();
+                        $pages = 0;
+                        $pageToken = "";
+                        for ($i = 0; ; $i++) {
+                            if($this->count > self::SENT_COUNT) break;
+                            $url = "https://api.mercari.jp/v2/entities:search";
+                            $options = array(
+                                "userId"=> "",
+                                "pageSize"=> 120,
+                                "pageToken"=> $pageToken,
+                                "searchSessionId"=> "6a0556d3330b3f3f8b87d8648c24aab1",
+                                "indexRouting"=> "INDEX_ROUTING_UNSPECIFIED",
+                                "thumbnailTypes"=> [],
+                                "searchCondition"=> array(
+                                    "keyword"=> $keyword,
+                                    "excludeKeyword"=> "",
+                                    "sort"=> "SORT_SCORE",
+                                    "order"=> "ORDER_DESC",
+                                    "status"=> [],
+                                    "sizeId"=> [],
+                                    "categoryId"=> [],
+                                    "brandId"=> [],
+                                    "sellerId"=> [],
+                                    "priceMin"=> $this->lower_price??0,
+                                    "priceMax"=> $this->lower_price??1000000,
+                                    "itemConditionId"=> [],
+                                    "shippingPayerId"=> [],
+                                    "shippingFromArea"=> [],
+                                    "shippingMethod"=> [],
+                                    "colorId"=> [],
+                                    "hasCoupon"=> false,
+                                    "attributes"=> [],
+                                    "itemTypes"=> [],
+                                    "skuIds"=> []
+                                ),
+                                "defaultDatasets"=> [
+                                    "DATASET_TYPE_MERCARI",
+                                    "DATASET_TYPE_BEYOND"
+                                ],
+                                "serviceFrom"=> "suruga",
+                                "withItemBrand"=> false,
+                                "withItemSize"=> false
+                            );
+                            $response = Http::withHeaders([
+                                'dpop' => 'eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4Ijoic2d1S2hIQ3c4WTllQzlTZ2ZiUWVMdzRKSU5BZ3VNRWVFQjZJLUVub1U2RSIsInkiOiJJWmtnS284dGhZX2ZYUHFhSTgyWndNci1TYjV0VHFrZC1SRGg2UktLS0V3In19.eyJpYXQiOjE2NzQ1NDY4NzIsImp0aSI6Ijc0MDM0MjkwLWQwMmYtNGRlYy1iZWE5LTdjZjAwZDU0NDY1NyIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvdjIvZW50aXRpZXM6c2VhcmNoIiwiaHRtIjoiUE9TVCIsInV1aWQiOiJkZDJjMGEzYS0wYjA4LTQ0YzEtOTJhYi0zMjQwMjEwOTU2N2UifQ.zs9F5ZWsLtmk7Ie-irjkfJYc50n0DGsdyzwXXUzyrIRdzv9dyVK4w0kh1RzmblK0HA7gOyJp9jQgrIbhlTILuQ',
+                                'x-platform' => 'web'
+                            ])->post($url,$options);
+                            $hitItems = $response->object()->items;
+                            foreach($hitItems as $item) {
+                                if($this->count > self::SENT_COUNT) break;
+                                if($this->compareWords($this->excluded_word, $item->name )){
+                                    array_push($this->results, [
+                                        'currentPrice' => $item->price,
+                                        'itemImageUrl' => $item->thumbnails[0],
+                                        'itemName' => $item->name,
+                                        'url' => 'https://jp.mercari.com/item/'.$item->id,
+                                        'service' => 'mercari',
+                                    ]);
+                                    $this->count++;
+                                }
+                            }
+                            
+                        }
+                    }
+
                 }
+
+                $this->sendEmail($results, $this->user);
             }
         }
         $this->info("end");
         return 0;
+    }
+
+    public function compareWords($excluded_word, $itemName) {
+        $result = true;
+        if(isset($excluded_word)) {
+            $words = explode(' ',$excluded_word);
+            foreach($words as $word) {
+                if(str_contains($itemName, $word))$result = false;
+            }
+        }
+        return $result;
     }
 
     public function compareCondition($lower_price, $upper_price,$excluded_word, $currentPrice, $itemName ) {
@@ -212,7 +291,7 @@ class SendNotification extends Command
         return $result;
     }
 
-    public function sendEmail($content,$url, $user) {
+    public function sendEmail($results, $user) {
 
         if(Url::where('user_id',$user->id)->where('url',$url)->count()){
             $this->info("it is already registered");
