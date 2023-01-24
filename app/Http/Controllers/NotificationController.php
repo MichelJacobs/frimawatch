@@ -305,7 +305,7 @@ class NotificationController extends Controller
                         $crawler = $client->request('GET', $url);
                         try {
                             $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
-                            ? $crawler->filter('.Pager__lists li:nth-last-child(2)')->text()
+                            ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
                             : 0
                         ;
                         if($pages == 0) break;
@@ -319,7 +319,6 @@ class NotificationController extends Controller
                         $crawler = $client->request('GET', $url);
                     }
                     try {
-                        
                         $crawler->filter('.Product')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a.Product__imageLink')->attr('href');
@@ -337,7 +336,7 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
-                        dd($pages);
+                        
                     }catch(\Throwable  $e){
                         continue;
                     }
