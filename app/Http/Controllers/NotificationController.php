@@ -246,7 +246,7 @@ class NotificationController extends Controller
                             "excludeKeyword"=> "",
                             "sort"=> "SORT_SCORE",
                             "order"=> "ORDER_DESC",
-                            "status"=> [],
+                            "status"=> ["STATUS_ON_SALE"],
                             "sizeId"=> [],
                             "categoryId"=> [],
                             "brandId"=> [],
@@ -343,6 +343,58 @@ class NotificationController extends Controller
                     
                 }
             }
+
+            if (str_contains($service, 'auction')) {
+                $client = new Client();
+                $pages = 1;
+                // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                for ($i = 1; $i < $pages + 1; $i++) {
+                    if($this->count > self::TOTAL_COUNT) break;
+                    if($i == 1 ){
+                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=2&exflg=1&b=1&n=50";//ヤフオク（定額）
+                        
+                        $crawler = $client->request('GET', $url);
+                        try {
+                            $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
+                            ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
+                            : 0
+                        ;
+                        if($pages == 0) break;
+                        }catch(\Throwable  $e){
+                            $pages = 1;break;
+                        }
+                        
+                    }else {
+                        $n = ($i - 1) * 50;
+                        $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=2&exflg=1&b=".(string)$n."&n=50";
+                        $crawler = $client->request('GET', $url);
+                    }
+                    try {
+                        $crawler->filter('.Product')->each(function ($node) {
+                            if($this->count > self::TOTAL_COUNT) return false;
+                            $url = $node->filter('a.Product__imageLink')->attr('href');
+                            $itemImageUrl = $node->filter('.Product__imageData')->attr('src');
+                            $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
+                            $itemName   = $node->filter('.Product__title')->text();
+                            if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                array_push($this->results, [
+                                    'currentPrice' => $currentPrice,
+                                    'itemImageUrl' => $itemImageUrl,
+                                    'itemName' => $itemName,
+                                    'url' => $url,
+                                    'service' => 'ヤフオク（定額）',
+                                ]);
+                                $this->count++;
+                            }
+                        });
+                        
+                    }catch(\Throwable  $e){
+                        continue;
+                    }
+                    
+                }
+            }
+
             //result part
             $str = '<div class="col-xl-12 col-md-12 mt-1">
                         <h4 class="mt-0 mb-1 text-danger" style="text-align:center;">ヒット件数 : '.count($this->results).'件</h4>

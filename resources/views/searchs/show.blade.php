@@ -77,8 +77,12 @@
                                                         <label class="form-check-label" for="mercari">(メルカリ)(mercari)</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="yahoo" name="services[yahoo]" {{in_array('yahoo' , $services)?'checked':''}}>
-                                                        <label class="form-check-label" for="yahoo">(ヤフオク)(yahoo)</label>
+                                                        <input class="form-check-input" type="checkbox" id="yahooflat" name="services[yahooflat]" {{in_array('yahooflat' , $services)?'checked':''}}>
+                                                        <label class="form-check-label" for="yahooflat">ヤフオク（定額）</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="auction" name="services[auction]" {{in_array('auction' , $services)?'checked':''}}>
+                                                        <label class="form-check-label" for="auction">ヤフオク（オークション）</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="ecoauc" name="services[ecoauc]" {{in_array('ecoauc' , $services)?'checked':''}}>
@@ -167,8 +171,11 @@
             if($("#mercari").is(':checked')){
                 services.push('mercari');
             }
-            if($("#yahoo").is(':checked')){
-                services.push('yahoo');
+            if($("#yahooflat").is(':checked')){
+                services.push('yahooflat');
+            }
+            if($("#auction").is(':checked')){
+                services.push('auction');
             }
             if($("#ecoauc").is(':checked')){
                 services.push('ecoauc');

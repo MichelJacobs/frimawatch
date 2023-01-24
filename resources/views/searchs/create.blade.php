@@ -76,8 +76,12 @@
                                                         <label class="form-check-label" for="mercari">(メルカリ)(mercari)</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="yahoo" name="services[yahoo]">
-                                                        <label class="form-check-label" for="yahoo">(ヤフオク)(yahoo)</label>
+                                                        <input class="form-check-input" type="checkbox" value="" id="yahooflat" name="services[yahooflat]">
+                                                        <label class="form-check-label" for="yahooflat">ヤフオク（定額）</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" value="" id="auction" name="services[auction]">
+                                                        <label class="form-check-label" for="auction">ヤフオク（オークション）</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" value="" id="ecoauc" name="services[ecoauc]">
@@ -166,8 +170,11 @@
             if($("#mercari").is(':checked')){
                 services.push('mercari');
             }
-            if($("#yahoo").is(':checked')){
-                services.push('yahoo');
+            if($("#yahooflat").is(':checked')){
+                services.push('yahooflat');
+            }
+            if($("#auction").is(':checked')){
+                services.push('auction');
             }
             if($("#ecoauc").is(':checked')){
                 services.push('ecoauc');

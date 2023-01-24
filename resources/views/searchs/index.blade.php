@@ -61,7 +61,38 @@
                                             <td>{{$search->excluded_words}}</td>
                                             <td>
                                                 @foreach ($search->services as $service)
-                                                    {{$service->service}}<br>
+                                                    @switch($service->service)
+                                                        @case('wowma')
+                                                            ブランディア<br>
+                                                            @break
+                                                    
+                                                        @case('2ndstreet')
+                                                            セカンドストリートオンライン<br>
+                                                            @break
+                                                    
+                                                        @case('komehyo')
+                                                            コメ兵<br>
+                                                            @break
+                                                    
+                                                        @case('mercari')
+                                                            メルカリ<br>
+                                                            @break
+                                                    
+                                                        @case('yahooflat')
+                                                            ヤフオク（定額）<br>
+                                                            @break
+                                                    
+                                                        @case('auction')
+                                                            ヤフオク（オークション）<br>
+                                                            @break
+                                                    
+                                                        @case('ecoauc')
+                                                            エコリングオークション<br>
+                                                            @break
+                                                    
+                                                        @default
+                                                            @break
+                                                    @endswitch
                                                 @endforeach
                                             </td>
                                             <td>{{$search->status}}</td>
