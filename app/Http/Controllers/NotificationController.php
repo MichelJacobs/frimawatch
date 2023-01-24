@@ -319,8 +319,8 @@ class NotificationController extends Controller
                         $crawler = $client->request('GET', $url);
                     }
                     try {
-                        dd($crawler->html());
-                        $crawler->filter('.Product')->each(function ($node) {
+                        
+                        $crawler->filter('.Product')->each(function ($node) {dd($node->html());
                             if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a.Product__imageLink')->attr('href');
                             $itemImageUrl = $node->filter('.Product__imageData')->attr('src');
