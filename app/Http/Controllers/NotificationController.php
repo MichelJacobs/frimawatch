@@ -382,7 +382,7 @@ class NotificationController extends Controller
                                     'itemImageUrl' => $itemImageUrl,
                                     'itemName' => $itemName,
                                     'url' => $url,
-                                    'service' => 'ヤフオク（定額）',
+                                    'service' => 'ヤフオク（オークション）',
                                 ]);
                                 $this->count++;
                             }
