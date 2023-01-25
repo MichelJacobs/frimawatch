@@ -29,4 +29,7 @@ Route::group(['middleware' => ['auth','admin']], function () {
     Route::resource('/user', 'App\Http\Controllers\UserController');
     Route::post('/user/disable', 'App\Http\Controllers\UserController@disableUser')->name('user.disable');
     Route::post('/user/enable', 'App\Http\Controllers\UserController@enableUser')->name('user.enable');
+
+    Route::get('/setting', 'App\Http\Controllers\UserController@setting')->name('user.setting');
+    Route::post('/setting/mailLimitStore', 'App\Http\Controllers\UserController@mailLimitStore')->name('user.mailLimitStore');
  });

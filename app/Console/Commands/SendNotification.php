@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 
 use App\Models\User;
 use App\Models\Url;
+use App\Models\Setting;
 use App\Models\Notification;
 use App\Models\NotificationService;
 
@@ -254,9 +255,111 @@ class SendNotification extends Command
                         }
                     }
 
+                    if (str_contains($service, 'yahooflat')) {
+                        $client = new Client();
+                        $pages = 1;
+                        // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                        for ($i = 1; $i < $pages + 1; $i++) {
+                            if($this->count > self::SENT_COUNT) break;
+                            if($i == 1 ){
+                                $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
+                                
+                                $crawler = $client->request('GET', $url);
+                                try {
+                                    $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
+                                    ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
+                                    : 0
+                                ;
+                                if($pages == 0) break;
+                                }catch(\Throwable  $e){
+                                    $pages = 1;break;
+                                }
+                                
+                            }else {
+                                $n = ($i - 1) * 50;
+                                $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=".(string)$n."&n=50";
+                                $crawler = $client->request('GET', $url);
+                            }
+                            try {
+                                $crawler->filter('.Product')->each(function ($node) {
+                                    if($this->count > self::SENT_COUNT) return false;
+                                    $url = $node->filter('a.Product__imageLink')->attr('href');
+                                    $itemImageUrl = $node->filter('.Product__imageData')->attr('src');
+                                    $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
+                                    $itemName   = $node->filter('.Product__title')->text();
+                                    if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                        array_push($this->results, [
+                                            'currentPrice' => $currentPrice,
+                                            'itemImageUrl' => $itemImageUrl,
+                                            'itemName' => $itemName,
+                                            'url' => $url,
+                                            'service' => 'ヤフオク（定額）',
+                                        ]);
+                                        $this->count++;
+                                    }
+                                });
+                                
+                            }catch(\Throwable  $e){
+                                continue;
+                            }
+                            
+                        }
+                    }
+        
+                    if (str_contains($service, 'auction')) {
+                        $client = new Client();
+                        $pages = 1;
+                        // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                        for ($i = 1; $i < $pages + 1; $i++) {
+                            if($this->count > self::SENT_COUNT) break;
+                            if($i == 1 ){
+                                $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=2&exflg=1&b=1&n=50";//ヤフオク（定額）
+                                
+                                $crawler = $client->request('GET', $url);
+                                try {
+                                    $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
+                                    ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
+                                    : 0
+                                ;
+                                if($pages == 0) break;
+                                }catch(\Throwable  $e){
+                                    $pages = 1;break;
+                                }
+                                
+                            }else {
+                                $n = ($i - 1) * 50;
+                                $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=2&exflg=1&b=".(string)$n."&n=50";
+                                $crawler = $client->request('GET', $url);
+                            }
+                            try {
+                                $crawler->filter('.Product')->each(function ($node) {
+                                    if($this->count > self::SENT_COUNT) return false;
+                                    $url = $node->filter('a.Product__imageLink')->attr('href');
+                                    $itemImageUrl = $node->filter('.Product__imageData')->attr('src');
+                                    $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
+                                    $itemName   = $node->filter('.Product__title')->text();
+                                    if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                        array_push($this->results, [
+                                            'currentPrice' => $currentPrice,
+                                            'itemImageUrl' => $itemImageUrl,
+                                            'itemName' => $itemName,
+                                            'url' => $url,
+                                            'service' => 'ヤフオク（オークション）',
+                                        ]);
+                                        $this->count++;
+                                    }
+                                });
+                                
+                            }catch(\Throwable  $e){
+                                continue;
+                            }
+                            
+                        }
+                    }
+
                 }
 
-                $this->sendEmail($results, $this->user);
+                $this->sendEmail($this->results, $this->user);
             }
         }
         $this->info("end");
@@ -293,62 +396,78 @@ class SendNotification extends Command
 
     public function sendEmail($results, $user) {
 
-        if(Url::where('user_id',$user->id)->where('url',$url)->count()){
-            $this->info("it is already registered");
-        }else{
-            $this->count++;
+        $items = $results;
+        $urls = Url::where('user_id',$user->id)->get();
+        foreach($urls as $url) {
+            foreach($results as $key => $result) {
+                if($url == $result['url']) {
+                    $this->info($result['url']."it is already registered");
+                    unset($items[$key]);break;
+                }
+            }
+        }
+        $content = $user->name.'様<br>
+                    商品があります。<br>';
+        
+        foreach($items as $item) {
             Url::create([
                 'user_id' => $user->id,
-                'url' => $url,
+                'url' => $item['url'],
             ]);
-            $email = $user->email;
-            $user_id = 'trialphoenix';
-            $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
-            if ($user_id === false) {
-                echo "ユーザIDは必須です";
-                exit;
-            }
-            if ($api_key === false) {
-                echo "APIキーは必須です";
-                exit;
-            }
-            // トークン生成
-            $str = "$user_id$api_key";
-            $token = base64_encode(strtolower(hash('sha256', $str)));
-            // APIエンドポイント
-            $url = 'https://app.engn.jp/api/v1/deliveries/transaction';
-            // POSTデータ
-            $data = [
-                "from" => [
-                        "email" => "devlife128@gmail.com",
-                        "name" => "frimawatch"
-                ],
-                "to" => $email,
-                "subject" => "商品があります。",
-                "encode" => "ISO-2022-JP",
-                "text_part" => "テスト配信",
-                "html_part" => $content
-            ];
-            $data = json_encode($data);
-    
-            // ヘッダー
-            $header = [
-                "Content-Type: application/json",
-                "Authorization: Bearer $token"
-            ];
-            // リクエスト内容を組み立て
-            $context = [
-                "http" => [
-                        "method"  => "POST",
-                        "header"  => implode("\r\n", $header),
-                        "content" => $data
-                ]
-            ];
-            // APIリクエスト
-            $res = file_get_contents($url, false, stream_context_create($context));
-            // 結果の出力
-            $this->info("sent");
+            $content .= '商品名　'.$item->itemName.'<br>
+            商品価格　'.$item->currentPrice.'<br>
+            商品サービス　'.$item->service.'<br>
+            商品ページ '.$item->url.'<br><br><br><br>';
+
         }
+        $this->count++;
+        $email = $user->email;
+        $user_id = 'trialphoenix';
+        $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
+        if ($user_id === false) {
+            echo "ユーザIDは必須です";
+            exit;
+        }
+        if ($api_key === false) {
+            echo "APIキーは必須です";
+            exit;
+        }
+        // トークン生成
+        $str = "$user_id$api_key";
+        $token = base64_encode(strtolower(hash('sha256', $str)));
+        // APIエンドポイント
+        $url = 'https://app.engn.jp/api/v1/deliveries/transaction';
+        // POSTデータ
+        $data = [
+            "from" => [
+                    "email" => "devlife128@gmail.com",
+                    "name" => "frimawatch"
+            ],
+            "to" => $email,
+            "subject" => "商品があります。",
+            "encode" => "ISO-2022-JP",
+            "text_part" => "テスト配信",
+            "html_part" => $content
+        ];
+        $data = json_encode($data);
+
+        // ヘッダー
+        $header = [
+            "Content-Type: application/json",
+            "Authorization: Bearer $token"
+        ];
+        // リクエスト内容を組み立て
+        $context = [
+            "http" => [
+                    "method"  => "POST",
+                    "header"  => implode("\r\n", $header),
+                    "content" => $data
+            ]
+        ];
+        // APIリクエスト
+        $res = file_get_contents($url, false, stream_context_create($context));
+        // 結果の出力
+        $this->info("sent");
         
     }
 }

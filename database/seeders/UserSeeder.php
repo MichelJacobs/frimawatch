@@ -27,11 +27,14 @@ class UserSeeder extends Seeder
         ]);
         DB::table('users')->insert([
             'name' => 'テスト ユーザー',
-            'email' => 'testuser@gmail.com',
+            'email' => 'superdev195128@gmail.com',
             'password' => Hash::make('password'),
             'license' => Str::random(20),
             'is_admin' => 0,
             'active' => 1,
+        ]);
+        DB::table('settings')->insert([
+            'mailLimit' => 100,
         ]);
     }
 }
