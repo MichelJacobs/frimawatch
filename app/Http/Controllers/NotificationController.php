@@ -252,7 +252,7 @@ class NotificationController extends Controller
                             "brandId"=> [],
                             "sellerId"=> [],
                             "priceMin"=> $this->lower_price??0,
-                            "priceMax"=> $this->lower_price??1000000,
+                            "priceMax"=> $this->upper_price??1000000,
                             "itemConditionId"=> [],
                             "shippingPayerId"=> [],
                             "shippingFromArea"=> [],
@@ -276,6 +276,8 @@ class NotificationController extends Controller
                         'x-platform' => 'web'
                     ])->post($url,$options);
                     $hitItems = $response->object()->items;
+                    $pageToken = $response->object()->meta->nextPageToken;
+                    
                     foreach($hitItems as $item) {
                         if($this->count > self::TOTAL_COUNT) break;
                         if($this->compareWords($this->excluded_word, $item->name )){
@@ -289,6 +291,8 @@ class NotificationController extends Controller
                             $this->count++;
                         }
                     }
+
+                    if($pageToken == "") break;
                     
                 }
             }
