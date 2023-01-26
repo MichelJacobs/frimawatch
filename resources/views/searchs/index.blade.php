@@ -86,8 +86,8 @@
                                                             ヤフオク（オークション）<br>
                                                             @break
                                                     
-                                                        @case('ecoauc')
-                                                            エコリングオークション<br>
+                                                        @case('netmall')
+                                                            中古通販のオフモール<br>
                                                             @break
                                                     
                                                         @default

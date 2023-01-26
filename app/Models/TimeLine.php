@@ -13,7 +13,11 @@ class TimeLine extends Model
 
     protected $fillable = [
         'user_id',
+        'itemName',
+        'itemImageUrl',
+        'currentPrice',
         'url',
+        'service',
     ];
 
     public function user()

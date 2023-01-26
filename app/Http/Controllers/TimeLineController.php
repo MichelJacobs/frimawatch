@@ -16,7 +16,7 @@ class TimeLineController extends Controller
     public function index()
     {
         //
-        $timelines = TimeLine::where('user_id',auth()->user()->id)->get();
+        $timelines = TimeLine::where('user_id',auth()->user()->id)->paginate(50);
 
         return view('timeline.index',compact('timelines'));
     }
@@ -51,6 +51,14 @@ class TimeLineController extends Controller
     public function show(TimeLine $timeLine)
     {
         //
+        
+    }
+
+    public function delete()
+    {
+        //
+        TimeLine::where('id',request()->itemId)->delete();
+        return "ok";
     }
 
     /**
