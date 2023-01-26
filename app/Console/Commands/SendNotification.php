@@ -520,6 +520,7 @@ class SendNotification extends Command
             // APIエンドポイント
             $url = 'https://app.engn.jp/api/v1/deliveries/transaction';
             // POSTデータ
+            
             $data = [
                 "from" => [
                         "email" => "devlife128@gmail.com",
@@ -531,8 +532,9 @@ class SendNotification extends Command
                 "text_part" => "テスト配信",
                 "html_part" => $content
             ];
+            
             $data = json_encode($data);
-    
+
             // ヘッダー
             $header = [
                 "Content-Type: application/json",
