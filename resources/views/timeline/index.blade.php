@@ -72,7 +72,7 @@
                                                 <td style="line-height: 2rem">
                                                     <span class="text-danger">{{$timeline->currentPrice}}円</span><br>
                                                     {{$timeline->itemName}}<br>
-                                                    {{$timeline->created_at}}
+                                                    {{$timeline->created_at->addHours(9)}}
                                                     @switch($timeline->service)
                                                         @case('wowma')
                                                             <span class="text-primary">ブランディア</span><br>
