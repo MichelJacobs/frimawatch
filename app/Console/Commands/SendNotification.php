@@ -495,20 +495,14 @@ class SendNotification extends Command
         if(count($items) > 0) {
             
             foreach($items as $item) {
-                TimeLine::create([
-                    'user_id' => $user->id,
-                    'itemName' => $item['itemName'],
-                    'itemImageUrl' => $item['itemImageUrl'],
-                    'currentPrice' => $item['currentPrice'],
-                    'url' => $item['url'],
-                    'service' => $item['service'],
-                ]);
+                
                 $content .= '商品名　'.$item['itemName'].'<br>
                 商品価格　'.$item['currentPrice'].'円<br>
                 商品サービス　'.$item['service'].'<br>
                 商品ページ '.$item['url'].'<br><br><br><br>';
     
             }
+            
             $email = $user->email;
             $user_id = 'trialphoenix';
             $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
@@ -556,6 +550,17 @@ class SendNotification extends Command
             $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
             $this->info("sent");
+
+            foreach($items as $item) {
+                TimeLine::create([
+                    'user_id' => $user->id,
+                    'itemName' => $item['itemName'],
+                    'itemImageUrl' => $item['itemImageUrl'],
+                    'currentPrice' => $item['currentPrice'],
+                    'url' => $item['url'],
+                    'service' => $item['service'],
+                ]);
+            }
 
             User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
         } else {
