@@ -64,7 +64,7 @@ class SendNotification extends Command
 
             if($user->mailSent >= $user->mailLimit) {
                 $this->info("mail limited");
-                return 0;
+                continue;
             }
             foreach($notifications as $notification) {
                 $this->count = 1;
