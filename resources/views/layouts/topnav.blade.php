@@ -17,6 +17,12 @@
                             <i class="ri-search-line me-1"></i> 横断検索
                         </a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{route('timeline.index')}}" id="topnav-dashboard" role="button"
+                            aria-haspopup="true" aria-expanded="false">
+                            <i class="ri-inbox-line me-1"></i> タイムライン
+                        </a>
+                    </li>
                     
                 </ul> <!-- end navbar-->
             </div> <!-- end .collapsed-->

@@ -7,7 +7,18 @@
         <!-- Start Content-->
         <div class="container-fluid">
 
-            
+            <div class="row mt-3">
+                <div class="col-12">
+                    @foreach (['info', 'success', 'danger', 'warning'] as $msg)
+                        @if (Session::has('system.message.' . $msg))
+                            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                {{ Session::get('system.message.' . $msg) }}
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -30,7 +41,7 @@
                                         <tr>
                                             <th>名前</th>
                                             <th>メールアドレス</th>
-                                            {{-- <th>ライセンス</th> --}}
+                                            <th>メール数 /メール上限</th>
                                             <th>ステータス</th>
                                             <th></th>
                                         </tr>
@@ -40,7 +51,7 @@
                                         <tr>
                                             <td>{{$user->name}}</td>
                                             <td>{{$user->email}}</td>
-                                            {{-- <td>{{$user->license}}</td> --}}
+                                            <td>{{$user->mailSent}}回<br>{{$user->mailLimit}}回</td>
                                             @if ($user->active)
                                             <td>
                                                 <span class="badge bg-primary p-1">有効</span>
@@ -52,6 +63,7 @@
                                             @endif
                                             
                                             <td>
+                                                <a href="{{ route('user.show', $user->id) }}" class="btn btn-sm btn-block btn-primary mt-1">編集</a>
                                                 @if ($user->active)
                                                 <button type="button" class="btn btn-sm btn-block mt-1 btn-danger btn-delete-user" data-id="{{ $user->id }}">停止</button>
                                                 @else

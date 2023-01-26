@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('license')->nullable();
             $table->Integer('mailLimit')->nullable()->default(0);
+            $table->Integer('mailSent')->nullable()->default(0);
             $table->tinyInteger('is_admin')->default(0);
             $table->tinyInteger('active')->default(1);
             $table->rememberToken();

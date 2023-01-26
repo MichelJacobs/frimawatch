@@ -208,13 +208,13 @@ class SendNotification extends Command
                                     "excludeKeyword"=> "",
                                     "sort"=> "SORT_SCORE",
                                     "order"=> "ORDER_DESC",
-                                    "status"=> [],
+                                    "status"=> ["STATUS_ON_SALE"],
                                     "sizeId"=> [],
                                     "categoryId"=> [],
                                     "brandId"=> [],
                                     "sellerId"=> [],
                                     "priceMin"=> $this->lower_price??0,
-                                    "priceMax"=> $this->lower_price??1000000,
+                                    "priceMax"=> $this->upper_price??1000000,
                                     "itemConditionId"=> [],
                                     "shippingPayerId"=> [],
                                     "shippingFromArea"=> [],
@@ -238,6 +238,8 @@ class SendNotification extends Command
                                 'x-platform' => 'web'
                             ])->post($url,$options);
                             $hitItems = $response->object()->items;
+                            $pageToken = $response->object()->meta->nextPageToken;
+                            
                             foreach($hitItems as $item) {
                                 if($this->count > self::SENT_COUNT) break;
                                 if($this->compareWords($this->excluded_word, $item->name )){
@@ -251,6 +253,8 @@ class SendNotification extends Command
                                     $this->count++;
                                 }
                             }
+        
+                            if($pageToken == "") break;
                             
                         }
                     }
@@ -345,6 +349,56 @@ class SendNotification extends Command
                                             'itemName' => $itemName,
                                             'url' => $url,
                                             'service' => 'ヤフオク（オークション）',
+                                        ]);
+                                        $this->count++;
+                                    }
+                                });
+                                
+                            }catch(\Throwable  $e){
+                                continue;
+                            }
+                            
+                        }
+                    }
+
+                    if (str_contains($service, 'netmall')) {
+                        $client = new Client();
+                        $pages = 1;
+                        // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
+                        for ($i = 1; $i < $pages + 1; $i++) {
+                            if($this->count > self::SENT_COUNT) break;
+                            if($i == 1 ){
+                                $url = "https://netmall.hardoff.co.jp/search/?exso=1&q=".$keyword."&s=7";
+                                
+                                $crawler = $client->request('GET', $url);
+                                try {
+                                    $pages = ($crawler->filter('.pagenation a')->count() > 0)
+                                    ? $crawler->filter('.pagenation a:nth-last-child(2)')->text()
+                                    : 0
+                                ;
+                                if($pages == 0) break;
+                                }catch(\Throwable  $e){
+                                    $pages = 1;break;
+                                }
+                                
+                            }else {
+                                $url = "https://netmall.hardoff.co.jp/search/?p=2&q=".$keyword."&exso=1&s=7";
+                                $crawler = $client->request('GET', $url);
+                            }
+                            try {
+                                $crawler->filter('.itemcolmn_item')->each(function ($node) {
+                                    if($this->count > self::SENT_COUNT) return false;
+                                    $url = $node->filter('.itemcolmn_item a')->attr('href');
+                                    $itemImageUrl = $node->filter('.item-img-square img')->attr('src');
+                                    $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.item-price-en')->text()), 10);
+                                    $itemName   = $node->filter('.item-brand-name')->text();
+                                    if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                        array_push($this->results, [
+                                            'currentPrice' => $currentPrice,
+                                            'itemImageUrl' => $itemImageUrl,
+                                            'itemName' => $itemName,
+                                            'url' => $url,
+                                            'service' => '中古通販のオフモール',
                                         ]);
                                         $this->count++;
                                     }

@@ -85,8 +85,8 @@
                                                         <label class="form-check-label" for="auction">ヤフオク（オークション）</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="ecoauc" name="services[ecoauc]" {{in_array('ecoauc' , $services)?'checked':''}}>
-                                                        <label class="form-check-label" for="ecoauc">(エコリングオークション)(ecoauc)</label>
+                                                        <input class="form-check-input" type="checkbox" value="" id="netmall" name="services[netmall]">
+                                                        <label class="form-check-label" for="netmall">(中古通販のオフモール)</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -177,8 +177,8 @@
             if($("#auction").is(':checked')){
                 services.push('auction');
             }
-            if($("#ecoauc").is(':checked')){
-                services.push('ecoauc');
+            if($("#netmall").is(':checked')){
+                services.push('netmall');
             }
             var status = $("#item_status").val();
             if(!keyword)alert("キーワードを入力してください。");

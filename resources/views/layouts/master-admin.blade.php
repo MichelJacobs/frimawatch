@@ -7,14 +7,14 @@
         <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
         <meta content="Coderthemes" name="author" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
 		<!-- App css -->
-		<link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bs-stylesheet" />
-		<link href="assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-stylesheet" />
+		<link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+		<link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" />
 
 		<!-- icons -->
-		<link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+		<link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
         @yield('custom_css')
 
@@ -36,11 +36,11 @@
         <!-- END wrapper -->
 
         <!-- Vendor js -->
-        <script src="assets/js/vendor.min.js"></script>
+        <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
 
         <!-- App js -->
-        <script src="assets/js/app.min.js"></script>
-        <script src="js/app.js"></script>
+        <script src="{{ asset('assets/js/app.min.js') }}"></script>
+        <script src="{{ asset('js/app.js') }}"></script>
 
         @yield('scripts')
         
