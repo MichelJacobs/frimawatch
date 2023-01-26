@@ -61,6 +61,11 @@ class SendNotification extends Command
         foreach($availableUsers as $user) {
             $this->user = $user;
             $notifications = $user->notifications;
+
+            if($user->mailSent >= $user->mailLimit) {
+                $this->info("mail limited");
+                return 0;
+            }
             foreach($notifications as $notification) {
                 $this->count = 1;
                 $this->results = [];
@@ -254,7 +259,7 @@ class SendNotification extends Command
                         "withItemSize"=> false
                     );
                     $response = Http::withHeaders([
-                        'dpop' => 'eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4Ijoic2d1S2hIQ3c4WTllQzlTZ2ZiUWVMdzRKSU5BZ3VNRWVFQjZJLUVub1U2RSIsInkiOiJJWmtnS284dGhZX2ZYUHFhSTgyWndNci1TYjV0VHFrZC1SRGg2UktLS0V3In19.eyJpYXQiOjE2NzQ1NDY4NzIsImp0aSI6Ijc0MDM0MjkwLWQwMmYtNGRlYy1iZWE5LTdjZjAwZDU0NDY1NyIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvdjIvZW50aXRpZXM6c2VhcmNoIiwiaHRtIjoiUE9TVCIsInV1aWQiOiJkZDJjMGEzYS0wYjA4LTQ0YzEtOTJhYi0zMjQwMjEwOTU2N2UifQ.zs9F5ZWsLtmk7Ie-irjkfJYc50n0DGsdyzwXXUzyrIRdzv9dyVK4w0kh1RzmblK0HA7gOyJp9jQgrIbhlTILuQ',
+                        'dpop' => 'eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4Ijoic2d1S2hIQ3c4WTllQzlTZ2ZiUWVMdzRKSU5BZ3VNRWVFQjZJLUVub1U2RSIsInkiOiJJWmtnS284dGhZX2ZYUHFhSTgyWndNci1TYjV0VHFrZC1SRGg2UktLS0V3In19.eyJpYXQiOjE2NzQ3MjI2NDAsImp0aSI6IjQ3YTc0YzUzLWY3OGItNGY1OS04ZGEyLWJmMDNlZTZkYzI0ZiIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvdjIvZW50aXRpZXM6c2VhcmNoIiwiaHRtIjoiUE9TVCIsInV1aWQiOiJkZDJjMGEzYS0wYjA4LTQ0YzEtOTJhYi0zMjQwMjEwOTU2N2UifQ.xcqFcoO0Yyz06FdaEN_3ZgtYYIkQfo0QXn-4-3Hn1QPwyPdBUzroFmkzMc5_wVpDc4tPJxYd5xYfPM7fFu49Gw',
                         'x-platform' => 'web'
                     ])->post($url,$options);
                     $hitItems = $response->object()->items;
@@ -471,7 +476,11 @@ class SendNotification extends Command
     public function sendEmail($results, $user) {
 
         $items = $results;
-        // $items = array_unique($items,SORT_REGULAR);
+        $items = array_unique($items,SORT_REGULAR);
+
+        $mailLimit = $user->mailLimit;
+        $mailSent = $user->mailSent;
+
         $urls = TimeLine::where('user_id',$user->id)->get();
         foreach($urls as $url) {
             foreach($results as $key => $result) {
@@ -484,6 +493,7 @@ class SendNotification extends Command
         $content = $user->name.'様<br>
                     商品があります。<br>';
         if(count($items) > 0) {
+            
             foreach($items as $item) {
                 TimeLine::create([
                     'user_id' => $user->id,
@@ -547,6 +557,8 @@ class SendNotification extends Command
             $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
             $this->info("sent");
+
+            User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
         } else {
             $this->info("There are no matching items");
         }
