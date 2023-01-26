@@ -272,7 +272,7 @@ class NotificationController extends Controller
                         "withItemSize"=> false
                     );
                     $response = Http::withHeaders([
-                        'dpop' => 'eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7ImNydiI6IlAtMjU2Iiwia3R5IjoiRUMiLCJ4Ijoic2d1S2hIQ3c4WTllQzlTZ2ZiUWVMdzRKSU5BZ3VNRWVFQjZJLUVub1U2RSIsInkiOiJJWmtnS284dGhZX2ZYUHFhSTgyWndNci1TYjV0VHFrZC1SRGg2UktLS0V3In19.eyJpYXQiOjE2NzQ3MjI2NDAsImp0aSI6IjQ3YTc0YzUzLWY3OGItNGY1OS04ZGEyLWJmMDNlZTZkYzI0ZiIsImh0dSI6Imh0dHBzOi8vYXBpLm1lcmNhcmkuanAvdjIvZW50aXRpZXM6c2VhcmNoIiwiaHRtIjoiUE9TVCIsInV1aWQiOiJkZDJjMGEzYS0wYjA4LTQ0YzEtOTJhYi0zMjQwMjEwOTU2N2UifQ.xcqFcoO0Yyz06FdaEN_3ZgtYYIkQfo0QXn-4-3Hn1QPwyPdBUzroFmkzMc5_wVpDc4tPJxYd5xYfPM7fFu49Gw',
+                        'dpop' => config('constants.options.drop'),
                         'x-platform' => 'web'
                     ])->post($url,$options);
                     $hitItems = $response->object()->items;
