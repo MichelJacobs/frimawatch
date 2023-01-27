@@ -39,6 +39,11 @@
                                 <div class="button-list text-end">
                                     <a href="{{route('notification.create')}}" class="btn btn-sm btn-primary mr-3 mb-3 btn-done">新しいアラートを作る</a>
                                 </div>
+
+                                <div class="button-list text-end mb-2">
+                                    メール数<span class="text-danger"> {{$user->mailSent}}回</span><br>
+                                    メール上限<span class="text-danger"> {{$user->mailLimit}}回</span>
+                                </div>
                                 
                                 <table class="table table-striped">
                                     <thead>
