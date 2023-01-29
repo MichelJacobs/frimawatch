@@ -16,7 +16,7 @@ class TimeLineController extends Controller
     public function index()
     {
         //
-        $timelines = TimeLine::where('user_id',auth()->user()->id)->paginate(50);
+        $timelines = TimeLine::where('user_id',auth()->user()->id)->orderBy('id', 'desc')->paginate(50);
 
         return view('timeline.index',compact('timelines'));
     }
