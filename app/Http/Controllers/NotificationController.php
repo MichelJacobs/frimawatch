@@ -308,7 +308,7 @@ class NotificationController extends Controller
                         $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
                         $order   = array(" ", "　");
                         $replace = '+';
-                        $url = str_replace($order, $replace, $url);dd($url);
+                        $url = str_replace($order, $replace, $url);
                         $crawler = $client->request('GET', $url);
                         try {
                             $pages = ($crawler->filter('.Pager__lists li')->count() > 0)
