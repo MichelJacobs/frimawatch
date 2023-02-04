@@ -292,7 +292,10 @@ class SendNotification extends Command
                             if($this->count > self::SENT_COUNT) break;
                             if($i == 1 ){
                                 $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
-                                
+                                $totalUrl = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=3&exflg=1&b=1&n=50";
+                                $totalcrawler = $client->request('GET', $totalUrl);
+                                $flatcount = intval(preg_replace('/[^0-9]+/', '', $totalcrawler->filter('.Tab__items li:nth-last-child(1) .Tab__subText')->text()), 10);
+                                if($flatcount == 0) break;
                                 $crawler = $client->request('GET', $url);
                                 try {
                                     $pages = ($crawler->filter('.Pager__lists li')->count() > 0)

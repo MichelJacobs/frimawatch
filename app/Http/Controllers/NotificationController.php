@@ -309,7 +309,7 @@ class NotificationController extends Controller
                         $totalUrl = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=3&exflg=1&b=1&n=50";
                         $totalcrawler = $client->request('GET', $totalUrl);
                         $flatcount = intval(preg_replace('/[^0-9]+/', '', $totalcrawler->filter('.Tab__items li:nth-last-child(1) .Tab__subText')->text()), 10);
-dd($flatcount);
+                        if($flatcount == 0) break;
                         // $order   = array(" ", "　");
                         // $replace = '+';
                         // $url = str_replace($order, $replace, $url);
