@@ -306,9 +306,13 @@ class NotificationController extends Controller
                     if($this->count > self::TOTAL_COUNT) break;
                     if($i == 1 ){
                         $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
-                        $order   = array(" ", "　");
-                        $replace = '+';
-                        $url = str_replace($order, $replace, $url);
+                        $totalUrl = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=3&exflg=1&b=1&n=50";
+                        $totalcrawler = $client->request('GET', $totalUrl);
+                        $flatcount = $totalcrawler->filter('.Tab__items li:nth-last-child(3) .Tab__subText')->text();
+dd($flatcount);
+                        // $order   = array(" ", "　");
+                        // $replace = '+';
+                        // $url = str_replace($order, $replace, $url);
                         $crawler = $client->request('GET', $url);
                         try {
                             $pages = ($crawler->filter('.Pager__lists li')->count() > 0)

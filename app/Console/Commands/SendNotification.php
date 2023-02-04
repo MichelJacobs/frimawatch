@@ -350,7 +350,6 @@ class SendNotification extends Command
                                     ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
                                     : 0
                                 ;
-                                if($pages == 0) break;
                                 }catch(\Throwable  $e){
                                     $pages = 1;break;
                                 }
@@ -378,6 +377,7 @@ class SendNotification extends Command
                                         $this->count++;
                                     }
                                 });
+                                if($pages == 0) break;
                                 
                             }catch(\Throwable  $e){
                                 continue;
