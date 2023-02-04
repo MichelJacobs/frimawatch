@@ -365,7 +365,6 @@ class NotificationController extends Controller
                             ? $crawler->filter('.Pager__lists li:nth-last-child(3)')->text()
                             : 0
                         ;
-                        if($pages == 0) break;
                         }catch(\Throwable  $e){
                             $pages = 1;break;
                         }
@@ -376,7 +375,6 @@ class NotificationController extends Controller
                         $crawler = $client->request('GET', $url);
                     }
                     try {
-                        dd($crawler->html());
                         $crawler->filter('.Product')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
                             $url = $node->filter('a.Product__imageLink')->attr('href');
@@ -394,6 +392,8 @@ class NotificationController extends Controller
                                 $this->count++;
                             }
                         });
+
+                        if($pages == 0) break;
                         
                     }catch(\Throwable  $e){
                         continue;
