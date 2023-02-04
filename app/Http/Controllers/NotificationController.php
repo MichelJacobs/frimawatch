@@ -308,7 +308,7 @@ class NotificationController extends Controller
                         $url = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=1&exflg=1&b=1&n=50";//ヤフオク（定額）
                         $totalUrl = "https://auctions.yahoo.co.jp/search/search?p=".$keyword."&va=".$keyword."&fixed=3&exflg=1&b=1&n=50";
                         $totalcrawler = $client->request('GET', $totalUrl);
-                        $flatcount = $totalcrawler->filter('.Tab__items li:nth-last-child(3) .Tab__subText')->text();
+                        $flatcount = $totalcrawler->filter('.Tab__items li:nth-last-child(4) .Tab__subText')->text();
 dd($flatcount);
                         // $order   = array(" ", "　");
                         // $replace = '+';
