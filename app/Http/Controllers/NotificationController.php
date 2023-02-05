@@ -94,40 +94,49 @@ class NotificationController extends Controller
             
             if($this->count > self::TOTAL_COUNT) break;
             if (str_contains($service, 'wowma')) {
-                $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-                $totalPages = 1;
-
-                for($i = 0; $i < $totalPages; $i++) {
+                $client = new Client();
+                $pages = 1;
+                for ($i = 1; $i < $pages + 1; $i++) {
                     if($this->count > self::TOTAL_COUNT) break;
-                    $response = Http::get('https://wowma.jp/catalog/api/search/items', [
-                        'keyword' => $new,
-                        'e_scope' => 'O',
-                        'user' => 39095799,
-                        'x' => 0,
-                        'y' => 0,
-                        'page' => $i,
-                        'uads' => 0,
-                        'acc_filter' => 'N',
-                        'shop_only' => 'Y',
-                        'ref_id' => 'catalog_klist2',
-                        'mode' => 'pc',
-                    ]);
-                    if($i == 0) {
-                        $totalPages = $response->object()->pageInformation->totalPages;
-                    }
-                    $hitItems = $response->object()->hitItems;
-                    foreach($hitItems as $item) {
-                        if($this->count > self::TOTAL_COUNT) break;
-                        if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
-                            array_push($this->results, [
-                                'currentPrice' => $item->currentPrice,
-                                'itemImageUrl' => $item->itemImageUrl,
-                                'itemName' => $item->itemName,
-                                'url' => $item->url,
-                                'service' => 'wowma',
-                            ]);
-                            $this->count++;
+                    if($i == 1 ){
+                        $url = "https://auction.brandear.jp/search/list/?SearchFullText=".$keyword;
+                        $crawler = $client->request('GET', $url);
+                        try {
+                            dd($crawler->html());
+                            $pages = $crawler->filter('.resultCount span')->text()
+                            ? $crawler->filter('.resultCount span')->text() / 50
+                            : 0
+                        ;
+                        }catch(\Throwable  $e){
+                            dd($e);
+                            $pages = 1;break;
                         }
+                        
+                    }else {
+                        $url = "https://auction.brandear.jp/search/list/?SearchFullText=".$keyword."&ItemOrder=0&page=".$i;
+                        $crawler = $client->request('GET', $url);
+                    }
+                    try {
+                        
+                        $crawler->filter('ul.clearfix li')->each(function ($node) {
+                            if($this->count > self::TOTAL_COUNT) return false;
+                            $url = $node->filter('.item_name a')->attr('href');
+                            $itemImageUrl = $node->filter('.img img')->attr('src');
+                            $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('span.price')->text()), 10);
+                            $itemName   = $node->filter('.item_name span')->text();
+                            if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                array_push($this->results, [
+                                    'currentPrice' => $currentPrice,
+                                    'itemImageUrl' => $itemImageUrl,
+                                    'itemName' => $itemName,
+                                    'url' => 'https://komehyo.jp'.$url,
+                                    'service' => 'komehyo',
+                                ]);
+                                $this->count++;
+                            }
+                        });
+                    }catch(\Throwable  $e){
+                        continue;
                     }
                 }
             }
