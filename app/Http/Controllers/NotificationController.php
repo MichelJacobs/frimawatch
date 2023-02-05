@@ -112,6 +112,7 @@ class NotificationController extends Controller
                         $client->setServerParameter('HTTP_USER_AGENT', 'user agent');
                         $crawler = $client->request('GET',$url);
                         try {
+                            dd($crawler->filter('.resultCount span')->text());
                             $pages = $crawler->filter('.resultCount span')->text()
                             ? intval($crawler->filter('.resultCount span')->text() / 50) + 1
                             : 0
