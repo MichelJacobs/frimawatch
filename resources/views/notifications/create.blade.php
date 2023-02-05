@@ -61,7 +61,7 @@
                                                 <div class="col-md-10">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" value="" id="wowma" name="services[wowma]">
-                                                        <label class="form-check-label" for="wowma">(ブランディア)(wowma)</label>
+                                                        <label class="form-check-label" for="wowma">(ブランディア)(brandear)</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" value="" id="2ndstreet" name="services[2ndstreet]">
