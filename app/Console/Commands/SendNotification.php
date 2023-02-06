@@ -517,7 +517,11 @@ class SendNotification extends Command
             }
         }
 
-        $content = $user->name."様<br>商品があります。<br>";
+        $content = $user->name."様 商品があります。". PHP_EOL;
+        if(isset($this->excluded_word)) {
+            $content .= "除外ワード : " .$this->excluded_word. PHP_EOL;
+        }
+        
         if(count($items) > 0) {
             
             foreach($items as $item) {
@@ -548,6 +552,7 @@ class SendNotification extends Command
                 TimeLine::create([
                     'user_id' => $user->id,
                     'itemName' => $item['itemName'],
+                    'excluded_word' => $this->excluded_word,
                     'itemImageUrl' => $item['itemImageUrl'],
                     'currentPrice' => $item['currentPrice'],
                     'url' => $item['url'],

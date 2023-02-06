@@ -14,6 +14,7 @@ class TimeLine extends Model
     protected $fillable = [
         'user_id',
         'itemName',
+        'excluded_word',
         'itemImageUrl',
         'currentPrice',
         'url',

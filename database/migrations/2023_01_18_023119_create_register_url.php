@@ -18,6 +18,7 @@ class CreateRegisterUrl extends Migration
             $table->bigInteger('user_id')->nullable()->unsigned()->comment('User ID');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('itemName')->nullable();
+            $table->string('excluded_word')->nullable();
             $table->string('itemImageUrl',300)->nullable();
             $table->string('currentPrice')->nullable();
             $table->string('url')->nullable();

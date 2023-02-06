@@ -70,9 +70,9 @@
                                                     <img src="{{$timeline->itemImageUrl}}" alt="" srcset="" width="100px" height="100px">
                                                 </td>
                                                 <td style="line-height: 2rem">
-                                                    <span class="text-danger">{{$timeline->currentPrice}}円</span><br>
+                                                    <span class="text-danger">{{$timeline->currentPrice}}円</span>除外ワード : {{$timeline->excluded_word??''}}<br>
                                                     {{$timeline->itemName}}<br>
-                                                    {{$timeline->created_at->addHours(9)}}
+                                                    {{$timeline->created_at->addHours(9)->format('Y-m-d H:i')}}
                                                     @switch($timeline->service)
                                                         @case('wowma')
                                                             <span class="text-primary">ブランディア</span><br>
@@ -103,6 +103,7 @@
                                                             @break
                                                     
                                                         @default
+                                                            <span class="text-primary">{{$timeline->service}}</span><br>
                                                             @break
                                                     @endswitch
                                                 </td>
