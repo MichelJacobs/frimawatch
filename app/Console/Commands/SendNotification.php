@@ -34,6 +34,7 @@ class SendNotification extends Command
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
+    protected $keyword;
     protected $excluded_word;
     protected $user;
     protected $results = [];
@@ -70,6 +71,7 @@ class SendNotification extends Command
                 $this->count = 0;
                 $this->results = [];
                 $keyword = $notification->keyword;
+                $this->keyword = $notification->keyword;
                 $this->lower_price = $notification->lower_price;
                 $this->upper_price = $notification->upper_price;
                 $this->excluded_word = $notification->excluded_words;
@@ -525,8 +527,8 @@ class SendNotification extends Command
             foreach($items as $item) {
                 
                 $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".$item['currentPrice']."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL;
-                if(isset($this->excluded_word)) {
-                    $content .= "除外ワード : " .$this->excluded_word. PHP_EOL . PHP_EOL . PHP_EOL;
+                if(isset($this->keyword)) {
+                    $content .= "キーワード : " .$this->keyword. PHP_EOL . PHP_EOL . PHP_EOL;
                 }
             }
             $email = $user->email;
@@ -552,7 +554,7 @@ class SendNotification extends Command
                 TimeLine::create([
                     'user_id' => $user->id,
                     'itemName' => $item['itemName'],
-                    'excluded_word' => $this->excluded_word,
+                    'keyword' => $this->keyword,
                     'itemImageUrl' => $item['itemImageUrl'],
                     'currentPrice' => $item['currentPrice'],
                     'url' => $item['url'],

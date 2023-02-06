@@ -71,8 +71,8 @@
                                                 </td>
                                                 <td style="line-height: 2rem">
                                                     <span class="text-danger">{{$timeline->currentPrice}}円</span>&nbsp;
-                                                    @if(isset($timeline->excluded_word))
-                                                    除外ワード : {{$timeline->excluded_word??''}}
+                                                    @if(isset($timeline->keyword))
+                                                    キーワード : {{$timeline->keyword??''}}
                                                     @endif
                                                     <br>
                                                     {{$timeline->itemName}}<br>
