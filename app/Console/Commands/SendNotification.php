@@ -545,7 +545,7 @@ class SendNotification extends Command
             $str = "$user_id$api_key";
             $token = base64_encode(strtolower(hash('sha256', $str)));
             // APIエンドポイント
-            $url = 'https://app.engn.jp/api/v1/deliveries/transaction';
+            $url = "https://app.engn.jp/api/v1/deliveries/transaction";
             // POSTデータ
             
             $data = [
@@ -574,7 +574,7 @@ class SendNotification extends Command
                         "header"  => implode("\r\n", $header),
                         "content" => $data
                 ]
-            ];dd($context);
+            ];
             // APIリクエスト
             $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
