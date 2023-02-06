@@ -62,7 +62,7 @@
                                                 <div class="col-md-10">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="wowma" name="services[wowma]" {{in_array('wowma' , $services)?'checked':''}}>
-                                                        <label class="form-check-label" for="wowma">(ブランディア)(wowma)</label>
+                                                        <label class="form-check-label" for="wowma">(ブランディア)(brandear)</label>
                                                     </div>
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="checkbox" id="2ndstreet" name="services[2ndstreet]" {{in_array('2ndstreet' , $services)?'checked':''}}>
