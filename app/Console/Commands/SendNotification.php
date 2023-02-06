@@ -558,7 +558,7 @@ class SendNotification extends Command
                 "html_part" => $content
             ];
             
-            // $data = json_encode($data);
+            $data = json_encode($data);
 
             // ヘッダー
             $header = [
@@ -574,8 +574,7 @@ class SendNotification extends Command
                 ]
             ];
             // APIリクエスト
-            Http::withHeaders($header)->post($url, $data);
-            // $res = file_get_contents($url, false, stream_context_create($context));
+            $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
             $this->info("sent");
 
