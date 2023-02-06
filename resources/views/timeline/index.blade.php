@@ -63,9 +63,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($timelines as $timeline)
+                                        @forelse($timelines as $key => $timeline)
                                             <tr>
-                                                <td>{{$timeline->id}}</td>
+                                                <td>{{$counts - $key - ($timelines->currentPage() - 1) * 50}}</td>
                                                 <td>
                                                     <img src="{{$timeline->itemImageUrl}}" alt="" srcset="" width="100px" height="100px">
                                                 </td>

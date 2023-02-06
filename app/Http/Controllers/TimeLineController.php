@@ -17,8 +17,8 @@ class TimeLineController extends Controller
     {
         //
         $timelines = TimeLine::where('user_id',auth()->user()->id)->orderBy('id', 'desc')->paginate(50);
-
-        return view('timeline.index',compact('timelines'));
+        $counts = TimeLine::where('user_id',auth()->user()->id)->count();
+        return view('timeline.index',compact('timelines','counts'));
     }
 
     /**
