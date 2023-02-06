@@ -522,7 +522,7 @@ class SendNotification extends Command
             
             foreach($items as $item) {
                 
-                // $content .= "商品名　$item['itemName']<br>商品価格　$item['currentPrice']円<br>商品サービス　$item['service']<br>商品ページ $item['url']<br><br><br><br>";
+                $content .= "商品名　".$item['itemName']."<br>商品価格　".$item['currentPrice']."円<br>商品サービス　".$item['service']."<br>商品ページ ".$item['url']."<br><br><br><br>";
     
             }
             $email = $user->email;
