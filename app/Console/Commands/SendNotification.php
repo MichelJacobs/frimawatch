@@ -544,18 +544,18 @@ class SendNotification extends Command
             // 結果の出力
             $this->info("sent");
 
-            // foreach($items as $item) {
-            //     TimeLine::create([
-            //         'user_id' => $user->id,
-            //         'itemName' => $item['itemName'],
-            //         'itemImageUrl' => $item['itemImageUrl'],
-            //         'currentPrice' => $item['currentPrice'],
-            //         'url' => $item['url'],
-            //         'service' => $item['service'],
-            //     ]);
-            // }
+            foreach($items as $item) {
+                TimeLine::create([
+                    'user_id' => $user->id,
+                    'itemName' => $item['itemName'],
+                    'itemImageUrl' => $item['itemImageUrl'],
+                    'currentPrice' => $item['currentPrice'],
+                    'url' => $item['url'],
+                    'service' => $item['service'],
+                ]);
+            }
 
-            // User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
+            User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
         } else {
             $this->info("There are no matching items");
         }
