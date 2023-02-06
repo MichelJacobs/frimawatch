@@ -558,7 +558,7 @@ class SendNotification extends Command
                 "html_part" => $content
             ];
             
-            $data = json_encode($data);
+            // $data = json_encode($data);
 
             // ヘッダー
             $header = [
