@@ -522,14 +522,14 @@ class SendNotification extends Command
             
             foreach($items as $item) {
                 
-                $content .= "商品名　".$item['itemName']."<br>商品価格　".$item['currentPrice']."円<br>商品サービス　".$item['service']."<br>商品ページ ".$item['url']."<br><br><br><br>";
+                $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".$item['currentPrice']."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL . PHP_EOL . PHP_EOL;
     
             }
             $email = $user->email;
             $user_id = 'trialphoenix';
             $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
-            Blastengine\Client::initialize($user_id, $api_key);
-            $transaction = new Blastengine\Transaction();
+            \Blastengine\Client::initialize($user_id, $api_key);
+            $transaction = new \Blastengine\Transaction();
             $transaction
                 ->to($email)
                 ->from("devlife128@gmail.com")
@@ -541,42 +541,6 @@ class SendNotification extends Command
                 // Error
             }
             
-           dd("sent");
-            // トークン生成
-            $str = "$user_id$api_key";
-            $token = base64_encode(strtolower(hash('sha256', $str)));
-            // APIエンドポイント
-            $url = "https://app.engn.jp/api/v1/deliveries/transaction";
-            // POSTデータ
-            $data = [
-                "from" => [
-                        "email" => "devlife128@gmail.com",
-                        "name" => "frimawatch"
-                ],
-                "to" => $email,
-                "subject" => "商品があります。",
-                "encode" => "ISO-2022-JP",
-                "text_part" => "テスト配信",
-                "html_part" => $content
-            ];
-            
-            $data = json_encode($data);
-
-            // ヘッダー
-            $header = [
-                "Content-Type: application/json",
-                "Authorization: Bearer $token"
-            ];
-            // リクエスト内容を組み立て
-            $context = [
-                "http" => [
-                        "method"  => "POST",
-                        "header"  => implode("\r\n", $header),
-                        "content" => $data
-                ]
-            ];
-            // APIリクエスト
-            $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
             $this->info("sent");
 
