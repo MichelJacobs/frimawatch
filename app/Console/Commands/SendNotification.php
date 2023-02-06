@@ -505,7 +505,7 @@ class SendNotification extends Command
         $items = $results;
         $items = array_unique($items,SORT_REGULAR);
 
-        $availableUser = User::where('id',$user->id)->get();
+        $availableUser = User::where('id',$user->id)->first();
         $mailLimit = $user->mailLimit;
         $mailSent = $availableUser->mailSent;
 
