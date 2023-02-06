@@ -517,8 +517,7 @@ class SendNotification extends Command
             }
         }
 
-        $content = $user->name.'様<br>
-                    商品があります。<br>';
+        $content = "$user->name様<br>商品があります。<br>";
         if(count($items) > 0) {
             
             foreach($items as $item) {
@@ -529,7 +528,7 @@ class SendNotification extends Command
                 商品ページ '.$item['url'].'<br><br><br><br>';
     
             }
-            
+            dd($content);
             $email = $user->email;
             $user_id = 'trialphoenix';
             $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
