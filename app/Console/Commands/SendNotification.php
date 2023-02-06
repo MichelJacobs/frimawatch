@@ -528,7 +528,6 @@ class SendNotification extends Command
                 商品ページ '.$item['url'].'<br><br><br><br>';
     
             }
-            dd($content);
             $email = $user->email;
             $user_id = 'trialphoenix';
             $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
