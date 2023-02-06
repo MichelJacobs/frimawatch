@@ -85,7 +85,7 @@
                                                         <label class="form-check-label" for="auction">ヤフオク（オークション）</label>
                                                     </div>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" value="" id="netmall" name="services[netmall]">
+                                                        <input class="form-check-input" type="checkbox" value="" id="netmall" name="services[netmall]" {{in_array('netmall' , $services)?'checked':''}}>
                                                         <label class="form-check-label" for="netmall">(中古通販のオフモール)</label>
                                                     </div>
                                                 </div>
