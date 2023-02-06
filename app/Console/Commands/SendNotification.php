@@ -574,7 +574,8 @@ class SendNotification extends Command
                 ]
             ];
             // APIリクエスト
-            $res = file_get_contents($url, false, stream_context_create($context));
+            Http::withHeaders($header)->post($url, $data);
+            // $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
             $this->info("sent");
 
