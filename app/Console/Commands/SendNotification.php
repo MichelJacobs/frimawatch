@@ -519,16 +519,15 @@ class SendNotification extends Command
         }
 
         $content = $user->name."様 商品があります。". PHP_EOL .PHP_EOL;
-        if(isset($this->excluded_word)) {
-            $content .= "除外ワード : " .$this->excluded_word. PHP_EOL.PHP_EOL;
-        }
         
         if(count($items) > 0) {
             
             foreach($items as $item) {
                 
-                $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".$item['currentPrice']."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL . PHP_EOL . PHP_EOL;
-    
+                $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".$item['currentPrice']."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL;
+                if(isset($this->excluded_word)) {
+                    $content .= "除外ワード : " .$this->excluded_word. PHP_EOL . PHP_EOL . PHP_EOL;
+                }
             }
             $email = $user->email;
             $user_id = 'trialphoenix';
