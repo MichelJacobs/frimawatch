@@ -505,8 +505,9 @@ class SendNotification extends Command
         $items = $results;
         $items = array_unique($items,SORT_REGULAR);
 
+        $availableUser = User::where('id',$user->id)->get();
         $mailLimit = $user->mailLimit;
-        $mailSent = $user->mailSent;
+        $mailSent = $availableUser->mailSent;
 
         $urls = TimeLine::where('user_id',$user->id)->get();
         foreach($urls as $url) {
