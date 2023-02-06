@@ -574,7 +574,7 @@ class SendNotification extends Command
                         "header"  => implode("\r\n", $header),
                         "content" => $data
                 ]
-            ];
+            ];dd($context);
             // APIリクエスト
             $res = file_get_contents($url, false, stream_context_create($context));
             // 結果の出力
