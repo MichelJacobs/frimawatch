@@ -545,6 +545,7 @@ class SendNotification extends Command
             // APIエンドポイント
             $url = "https://app.engn.jp/api/v1/deliveries/transaction";
             // POSTデータ
+            $content = "test test";
             $data = [
                 "from" => [
                         "email" => "devlife128@gmail.com",
