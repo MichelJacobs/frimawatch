@@ -70,7 +70,11 @@
                                                     <img src="{{$timeline->itemImageUrl}}" alt="" srcset="" width="100px" height="100px">
                                                 </td>
                                                 <td style="line-height: 2rem">
-                                                    <span class="text-danger">{{$timeline->currentPrice}}円</span>除外ワード : {{$timeline->excluded_word??''}}<br>
+                                                    <span class="text-danger">{{$timeline->currentPrice}}円</span>&nbsp;
+                                                    @if(isset($timeline->excluded_word))
+                                                    除外ワード : {{$timeline->excluded_word??''}}
+                                                    @endif
+                                                    <br>
                                                     {{$timeline->itemName}}<br>
                                                     {{$timeline->created_at->addHours(9)->format('Y-m-d H:i')}}
                                                     @switch($timeline->service)

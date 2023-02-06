@@ -30,7 +30,7 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 25;
+    public const SENT_COUNT = 30;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
@@ -72,7 +72,7 @@ class SendNotification extends Command
                 $keyword = $notification->keyword;
                 $this->lower_price = $notification->lower_price;
                 $this->upper_price = $notification->upper_price;
-                $this->excluded_word = $notification->excluded_word;
+                $this->excluded_word = $notification->excluded_words;
                 $services = $notification->services;
                 $status = $notification->status;
 
@@ -517,7 +517,7 @@ class SendNotification extends Command
             }
         }
 
-        $content = $user->name."様 商品があります。". PHP_EOL;
+        $content = $user->name."様". PHP_EOL .PHP_EOL." 商品があります。". PHP_EOL;
         if(isset($this->excluded_word)) {
             $content .= "除外ワード : " .$this->excluded_word. PHP_EOL;
         }
