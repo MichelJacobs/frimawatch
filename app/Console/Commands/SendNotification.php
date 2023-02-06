@@ -517,7 +517,7 @@ class SendNotification extends Command
             }
         }
 
-        $content = $user->name様."<br>商品があります。<br>";
+        $content = $user->name."様<br>商品があります。<br>";
         if(count($items) > 0) {
             
             foreach($items as $item) {
