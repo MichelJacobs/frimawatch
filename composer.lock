@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2880c0650e237840c6957648494282d",
+    "content-hash": "8df22154553e2344db8fa6ca32b30ba4",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -61,6 +61,49 @@
                 "source": "https://github.com/asm89/stack-cors/tree/v2.1.1"
             },
             "time": "2022-01-18T09:12:03+00:00"
+        },
+        {
+            "name": "blastengine/blastengine",
+            "version": "v0.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/blastengineMania/blastengine-php.git",
+                "reference": "4d48d05b1cdac04af60c318438b41c32b6e966c9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/blastengineMania/blastengine-php/zipball/4d48d05b1cdac04af60c318438b41c32b6e966c9",
+                "reference": "4d48d05b1cdac04af60c318438b41c32b6e966c9",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Blastengine\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Atsushi Nakatsugawa",
+                    "email": "atsushi@moongift.jp"
+                }
+            ],
+            "description": "This library sends email quickly using blastengine API.",
+            "support": {
+                "issues": "https://github.com/blastengineMania/blastengine-php/issues",
+                "source": "https://github.com/blastengineMania/blastengine-php/tree/v0.0.3"
+            },
+            "time": "2022-12-20T06:42:42+00:00"
         },
         {
             "name": "brick/math",

@@ -528,14 +528,20 @@ class SendNotification extends Command
             $email = $user->email;
             $user_id = 'trialphoenix';
             $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
-            if ($user_id === false) {
-                echo "ユーザIDは必須です";
-                exit;
+            Blastengine\Client::initialize($user_id, $api_key);
+            $transaction = new Blastengine\Transaction();
+            $transaction
+                ->to($email)
+                ->from("devlife128@gmail.com")
+                ->subject('商品があります。')
+                ->text_part($content);
+            try {
+                $transaction->send();
+            } catch ( Exception $ex ) {
+                // Error
             }
-            if ($api_key === false) {
-                echo "APIキーは必須です";
-                exit;
-            }
+            
+           dd("sent");
             // トークン生成
             $str = "$user_id$api_key";
             $token = base64_encode(strtolower(hash('sha256', $str)));
