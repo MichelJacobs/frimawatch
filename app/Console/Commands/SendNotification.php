@@ -517,9 +517,9 @@ class SendNotification extends Command
             }
         }
 
-        $content = $user->name."様". PHP_EOL .PHP_EOL." 商品があります。". PHP_EOL;
+        $content = $user->name."様 商品があります。". PHP_EOL .PHP_EOL;
         if(isset($this->excluded_word)) {
-            $content .= "除外ワード : " .$this->excluded_word. PHP_EOL;
+            $content .= "除外ワード : " .$this->excluded_word. PHP_EOL.PHP_EOL;
         }
         
         if(count($items) > 0) {
