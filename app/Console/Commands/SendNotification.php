@@ -80,40 +80,64 @@ class SendNotification extends Command
                     
                     if($this->count > self::SENT_COUNT) break;
                     if (str_contains($service, 'wowma')) {
-                        $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-                        $totalPages = 1;
-
-                        for($i = 0; $i < $totalPages; $i++) {
+                        $client = new Client();
+                        $pages = 0;
+                        for ($i = 0; $i < $pages + 1; $i++) {
                             if($this->count > self::SENT_COUNT) break;
-                            $response = Http::get('https://wowma.jp/catalog/api/search/items', [
-                                'keyword' => $new,
-                                'e_scope' => 'O',
-                                'user' => 39095799,
-                                'x' => 0,
-                                'y' => 0,
-                                'page' => $i,
-                                'uads' => 0,
-                                'acc_filter' => 'N',
-                                'shop_only' => 'Y',
-                                'ref_id' => 'catalog_klist2',
-                                'mode' => 'pc',
-                            ]);
-                            if($i == 0) {
-                                $totalPages = $response->object()->pageInformation->totalPages;
-                            }
-                            $hitItems = $response->object()->hitItems;
-                            foreach($hitItems as $item) {
-                                if($this->count > self::SENT_COUNT) break;
-                                if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $item->currentPrice, $item->itemName )){
-                                    array_push($this->results, [
-                                        'currentPrice' => $item->currentPrice,
-                                        'itemImageUrl' => $item->itemImageUrl,
-                                        'itemName' => $item->itemName,
-                                        'url' => $item->url,
-                                        'service' => 'wowma',
-                                    ]);
-                                    $this->count++;
+                            if($i == 0 ){
+                                $url = "https://auction.brandear.jp/search/list/?SearchFullText=".$keyword;
+                                $client = new Client(HttpClient::create([
+                                    'timeout'         => 20,
+                                    'headers' => [
+                                        'Accept' => '*/*',
+                                        'Host' => 'auction.brandear.jp',
+                                        'Postman-Token' => '',
+                                        'Cookie' => 'ba_defacto_analytics=%5B%5D; ba_search_history_entire=K%B42%B4%AA%CE%B42%B0N%B42%B2%AA.%B62%B1R%CAN%AD%2CV%02%F2%A1%12%C5V%86%40%C1%E0%D4%C4%A2%E4%0C%B7%D2%9C%9C%90%D4%8A%12%25%EB%DAb%2B3%2B%A5%B2%C4%9C%D2TT%C5%96VJ%8F%9B%B6%3Fn%5E%FC%B8%B9%05%A8%AC%B6%16%00; ba_sessid=6cfaca6f01c7292770b4a341000ffb32',
+                                        ]
+                                    ]));
+                                $client->setServerParameter('HTTP_USER_AGENT', 'user agent');
+                                $crawler = $client->request('GET',$url);
+                                try {
+                                    $pages = $crawler->filter('.resultCount span')->text()
+                                    ? (intval($crawler->filter('.resultCount span')->text() / 50) + 1)
+                                    : 0
+                                ;
+                                }catch(\Throwable  $e){
+                                    $pages = 0;break;
                                 }
+                            }else {
+                                $url = "https://auction.brandear.jp/search/list/?SearchFullText=".$keyword."&ItemOrder=0&page=".$i;
+                                $client = new Client(HttpClient::create([
+                                    'timeout'         => 20,
+                                    'headers' => [
+                                        'Accept' => '*/*',
+                                        'Host' => 'auction.brandear.jp',
+                                        'Postman-Token' => '',
+                                        'Cookie' => 'ba_defacto_analytics=%5B%5D; ba_search_history_entire=K%B42%B4%AA%CE%B42%B0N%B42%B2%AA.%B62%B1R%CAN%AD%2CV%02%F2%A1%12%C5V%86%40%C1%E0%D4%C4%A2%E4%0C%B7%D2%9C%9C%90%D4%8A%12%25%EB%DAb%2B3%2B%A5%B2%C4%9C%D2TT%C5%96VJ%8F%9B%B6%3Fn%5E%FC%B8%B9%05%A8%AC%B6%16%00; ba_sessid=6cfaca6f01c7292770b4a341000ffb32',
+                                        ]
+                                    ]));
+                                $crawler = $client->request('GET', $url);
+                            }
+                            try {
+                                $crawler->filter('#result li')->each(function ($node) {
+                                    if($this->count > self::SENT_COUNT) return false;
+                                    $url = $node->filter('.item_name a')->attr('href');
+                                    $itemImageUrl = $node->filter('.item .img img')->attr('data-original');
+                                    $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('span.price')->text()), 10);
+                                    $itemName   = $node->filter('.item_name span')->text();
+                                    if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
+                                        array_push($this->results, [
+                                            'currentPrice' => $currentPrice,
+                                            'itemImageUrl' => $itemImageUrl,
+                                            'itemName' => $itemName,
+                                            'url' => 'https://auction.brandear.jp'.$url,
+                                            'service' => 'brandear',
+                                        ]);
+                                        $this->count++;
+                                    }
+                                });
+                            }catch(\Throwable  $e){
+                                continue;
                             }
                         }
                     }
