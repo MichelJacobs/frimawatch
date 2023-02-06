@@ -522,7 +522,7 @@ class SendNotification extends Command
             
             foreach($items as $item) {
                 
-                $content .= "商品名　$item['itemName']<br>商品価格　$item['currentPrice']円<br>商品サービス　$item['service']<br>商品ページ $item['url']<br><br><br><br>";
+                // $content .= "商品名　$item['itemName']<br>商品価格　$item['currentPrice']円<br>商品サービス　$item['service']<br>商品ページ $item['url']<br><br><br><br>";
     
             }
             $email = $user->email;
@@ -574,18 +574,18 @@ class SendNotification extends Command
             // 結果の出力
             $this->info("sent");
 
-            foreach($items as $item) {
-                TimeLine::create([
-                    'user_id' => $user->id,
-                    'itemName' => $item['itemName'],
-                    'itemImageUrl' => $item['itemImageUrl'],
-                    'currentPrice' => $item['currentPrice'],
-                    'url' => $item['url'],
-                    'service' => $item['service'],
-                ]);
-            }
+            // foreach($items as $item) {
+            //     TimeLine::create([
+            //         'user_id' => $user->id,
+            //         'itemName' => $item['itemName'],
+            //         'itemImageUrl' => $item['itemImageUrl'],
+            //         'currentPrice' => $item['currentPrice'],
+            //         'url' => $item['url'],
+            //         'service' => $item['service'],
+            //     ]);
+            // }
 
-            User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
+            // User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
         } else {
             $this->info("There are no matching items");
         }
