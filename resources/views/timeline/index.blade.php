@@ -76,7 +76,7 @@
                                                     @endif
                                                     <br>
                                                     {{$timeline->itemName}}<br>
-                                                    {{$timeline->created_at->addHours(9)->format('Y-m-d H:i')}}
+                                                    {{$timeline->created_at?$timeline->created_at->addHours(9)->format('Y-m-d H:i'):''}}
                                                     @switch($timeline->service)
                                                         @case('wowma')
                                                             <span class="text-primary">ブランディア</span><br>
