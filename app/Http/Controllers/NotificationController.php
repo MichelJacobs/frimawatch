@@ -517,15 +517,12 @@ class NotificationController extends Controller
         if(str_contains($productTime, '日')){
             $time = intval(preg_replace('/[^0-9]+/', '', $productTime), 10);
             if($time == 1) {
-                dd('1'.$productTime);
                 return true;
             }
             else {
-                dd('2'.$productTime);
                 return false;
             }
         }else{
-            dd('3'.$productTime);
             return true;
         }
     }
