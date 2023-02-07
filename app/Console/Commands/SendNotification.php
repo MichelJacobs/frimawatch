@@ -9,6 +9,7 @@ use App\Models\TimeLine;
 use App\Models\Setting;
 use App\Models\Notification;
 use App\Models\NotificationService;
+use DB;
 
 use Goutte\Client;
 use Symfony\Component\HttpClient\HttpClient;
@@ -507,9 +508,7 @@ class SendNotification extends Command
         $items = $results;
         $items = array_unique($items,SORT_REGULAR);
 
-        $availableUser = User::where('id',$user->id)->first();
         $mailLimit = $user->mailLimit;
-        $mailSent = $availableUser->mailSent;
 
         $urls = TimeLine::where('user_id',$user->id)->get();
         foreach($urls as $url) {
@@ -550,19 +549,31 @@ class SendNotification extends Command
             // 結果の出力
             $this->info("sent");
 
-            foreach($items as $item) {
-                TimeLine::create([
-                    'user_id' => $user->id,
-                    'itemName' => $item['itemName'],
-                    'keyword' => $this->keyword,
-                    'itemImageUrl' => $item['itemImageUrl'],
-                    'currentPrice' => $item['currentPrice'],
-                    'url' => $item['url'],
-                    'service' => $item['service'],
-                ]);
-            }
+            DB::beginTransaction();
+            try {
+                $inserted_data = [];
+                foreach($items as $item) {
+                    array_push($inserted_data,[
+                        'user_id' => $user->id,
+                        'itemName' => $item['itemName'],
+                        'keyword' => $this->keyword,
+                        'itemImageUrl' => $item['itemImageUrl'],
+                        'currentPrice' => $item['currentPrice'],
+                        'url' => $item['url'],
+                        'service' => $item['service'],
+                    ]) ;
+                }
+                TimeLine::lockForUpdate()->insert($inserted_data);
+                $availableUser = User::where('id',$user->id)->lockForUpdate()->first();
+                $mailSent = $availableUser->mailSent;
+                User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
 
-            User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollback();
+                
+            }
+            
         } else {
             $this->info("There are no matching items");
         }
