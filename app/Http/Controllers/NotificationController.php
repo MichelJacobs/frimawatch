@@ -410,14 +410,17 @@ class NotificationController extends Controller
                             $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.Product__priceValue')->text()), 10);
                             $itemName   = $node->filter('.Product__title')->text();
                             if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
-                                array_push($this->results, [
-                                    'currentPrice' => $currentPrice,
-                                    'itemImageUrl' => $itemImageUrl,
-                                    'itemName' => $itemName,
-                                    'url' => $url,
-                                    'service' => 'ヤフオク（オークション）',
-                                ]);
-                                $this->count++;
+                                $productTime  = $node->filter('.Product__time')->text();
+                                if($this->productTimeCompare($productTime)){
+                                    array_push($this->results, [
+                                        'currentPrice' => $currentPrice,
+                                        'itemImageUrl' => $itemImageUrl,
+                                        'itemName' => $itemName,
+                                        'url' => $url,
+                                        'service' => 'ヤフオク（オークション）',
+                                    ]);
+                                    $this->count++;
+                                }
                             }
                         });
 
@@ -508,6 +511,16 @@ class NotificationController extends Controller
         }
 
         return $str;
+    }
+
+    public function productTimeCompare($productTime){
+        if(str_contains($productTime, '日')){
+            $time = intval(preg_replace('/[^0-9]+/', '', $productTime), 10);
+            if($time == 1) return true;
+            else return false;
+        }else{
+            return true;
+        }
     }
 
     public function compareWords($excluded_word, $itemName) {
