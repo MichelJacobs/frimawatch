@@ -578,6 +578,8 @@ class SendNotification extends Command
                         'currentPrice' => $item['currentPrice'],
                         'url' => $item['url'],
                         'service' => $item['service'],
+                        "created_at" =>  \Carbon\Carbon::now(), # new \Datetime()
+                        "updated_at" => \Carbon\Carbon::now(),  # new \Datetime()
                     ]) ;
                 }
                 TimeLine::lockForUpdate()->insert($inserted_data);
