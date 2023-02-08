@@ -532,6 +532,7 @@ class NotificationController extends Controller
         if(isset($excluded_word)) {
             $words = explode(' ',$excluded_word);
             foreach($words as $word) {
+                if($word == "") continue;
                 if(str_contains($itemName, $word))$result = false;
             }
         }
@@ -547,6 +548,7 @@ class NotificationController extends Controller
                 if(isset($excluded_word)) {
                     $words = explode(' ',$excluded_word);
                     foreach($words as $word) {
+                        if($word == "") continue;
                         if(str_contains($itemName, $word))$result = false;
                     }
                 }

@@ -31,7 +31,7 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 1000;
+    public const SENT_COUNT = 50;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
@@ -497,6 +497,7 @@ class SendNotification extends Command
         if(isset($excluded_word)) {
             $words = explode(' ',$excluded_word);
             foreach($words as $word) {
+                if($word == "") continue;
                 if(str_contains($itemName, $word))$result = false;
             }
         }
@@ -512,6 +513,7 @@ class SendNotification extends Command
                 if(isset($excluded_word)) {
                     $words = explode(' ',$excluded_word);
                     foreach($words as $word) {
+                        if($word == "") continue;
                         if(str_contains($itemName, $word))$result = false;
                     }
                 }
