@@ -584,7 +584,7 @@ class SendNotification extends Command
                 TimeLine::lockForUpdate()->insert($inserted_data);
                 $availableUser = User::where('id',$user->id)->lockForUpdate()->first();
                 $mailSent = $availableUser->mailSent;
-                User::where('id',$user->id)->update(array('mailSent' => $mailSent + 1));
+                User::where('id',$user->id)->lockForUpdate()->update(array('mailSent' => $mailSent + 1));
 
                 DB::commit();
             } catch (\Exception $e) {
