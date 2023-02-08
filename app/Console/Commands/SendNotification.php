@@ -31,7 +31,7 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 5000;
+    public const SENT_COUNT = 100;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
