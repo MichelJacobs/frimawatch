@@ -31,7 +31,7 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 100;
+    public const SENT_COUNT = 50;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
@@ -526,8 +526,8 @@ class SendNotification extends Command
         $items = array_unique($items,SORT_REGULAR);
 
         $mailLimit = $user->mailLimit;
-
-        $urls = TimeLine::where('user_id',$user->id)->get();
+        
+        $urls = TimeLine::where('user_id',$user->id)->lockForUpdate()->get();
         foreach($urls as $url) {
             foreach($results as $key => $result) {
                 if($url->url == $result['url']) {
@@ -535,7 +535,6 @@ class SendNotification extends Command
                 }
             }
         }
-
         $content = $user->name."様 商品があります。". PHP_EOL .PHP_EOL;
         
         if(count($items) > 0) {
