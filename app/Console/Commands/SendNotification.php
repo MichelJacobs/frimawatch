@@ -31,7 +31,7 @@ class SendNotification extends Command
      */
     protected $description = 'Command description';
 
-    public const SENT_COUNT = 50;
+    public const SENT_COUNT = 1000;
     protected $count = 1;
     protected $lower_price;
     protected $upper_price;
@@ -581,6 +581,7 @@ class SendNotification extends Command
                         "updated_at" => \Carbon\Carbon::now(),  # new \Datetime()
                     ]) ;
                 }
+                
                 TimeLine::lockForUpdate()->insert($inserted_data);
                 $availableUser = User::where('id',$user->id)->lockForUpdate()->first();
                 $mailSent = $availableUser->mailSent;
