@@ -36,7 +36,7 @@
                     <img src="{{ asset('assets/images/logo-sm.png')}}" alt="" height="24">
                 </span>
                 <span class="logo-lg fs-3 text-white">
-                フリマウォッチ
+                打ち出の小槌
             </span></a>
         </div>
 

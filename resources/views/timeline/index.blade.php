@@ -10,7 +10,7 @@
         display: none;
     }
 
-    nav > div:first-of-type {
+    nav > div:first-of-type span {
         display: none;
     }
     nav > div:nth-child(2) {
@@ -56,10 +56,10 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>画像</th>
-                                            <th>商品情報</th>
-                                            <th>操作</th>
+                                            <th style="width:5%;">No</th>
+                                            <th style="width:15%;">画像</th>
+                                            <th style="width:60%;">商品情報</th>
+                                            <th style="width:20%;">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>

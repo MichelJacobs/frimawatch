@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->Integer('mailSent')->nullable()->default(0);
             $table->tinyInteger('is_admin')->default(0);
             $table->tinyInteger('active')->default(1);
+            $table->tinyInteger('mailStatus')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });

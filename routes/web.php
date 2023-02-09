@@ -24,6 +24,7 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::post('/scrape', 'App\Http\Controllers\NotificationController@scrape')->name('scrape');
     Route::resource('/search', 'App\Http\Controllers\SearchController');
     Route::resource('/timeline', 'App\Http\Controllers\TimeLineController');
+    Route::resource('/user/setting', 'App\Http\Controllers\UserSettingController');
     Route::post('/timeline/delete', 'App\Http\Controllers\TimeLineController@delete')->name('timeline.delete');
 });
 
