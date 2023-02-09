@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class UserSettingController extends Controller
 {
@@ -14,7 +15,8 @@ class UserSettingController extends Controller
     public function index()
     {
         //
-        return view('setting.index');
+        $user = auth()->user();
+        return view('setting.index', compact('user'));
     }
 
     /**
@@ -36,6 +38,9 @@ class UserSettingController extends Controller
     public function store(Request $request)
     {
         //
+        User::where('id', auth()->user()->id)->update(array('mailStatus' => $request->mailStatus));
+
+        return back()->with(['system.message.success' => '設定しました。']);
     }
 
     /**

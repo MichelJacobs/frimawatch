@@ -68,6 +68,10 @@ class SendNotification extends Command
                 $this->info("mail limited");
                 continue;
             }
+            if($user->mailStatus == "off") {
+                $this->info("mail notification off");
+                continue;
+            }
             foreach($notifications as $notification) {
                 $this->count = 0;
                 $this->results = [];

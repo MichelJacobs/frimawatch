@@ -34,57 +34,31 @@
             <div class="row">
                 <div class="col-12">
 
-                <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>名前</th>
-                                            <th>メールアドレス</th>
-                                            <th>メール数 /メール上限</th>
-                                            <th>ステータス</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @forelse($users as $user)
-                                        <tr>
-                                            <td>{{$user->name}}</td>
-                                            <td>{{$user->email}}</td>
-                                            <td>{{$user->mailSent}}回<br>{{$user->mailLimit}}回</td>
-                                            @if ($user->active)
-                                            <td>
-                                                <span class="badge bg-primary p-1">有効</span>
-                                            </td>
-                                            @else
-                                            <td>
-                                                <span class="badge bg-danger p-1">無効</span>
-                                            </td>
-                                            @endif
-                                            
-                                            <td>
-                                                <a href="{{ route('user.show', $user->id) }}" class="btn btn-sm btn-block btn-primary mt-1">編集</a>
-                                                @if ($user->active)
-                                                <button type="button" class="btn btn-sm btn-block mt-1 btn-danger btn-delete-user" data-id="{{ $user->id }}">停止</button>
-                                                @else
-                                                <button type="button" class="btn btn-sm btn-block mt-1 btn-primary btn-start-user" data-id="{{ $user->id }}">再開</button>
-                                                @endif
-                                                
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="7"><h4 class="text-center mt-3">データがありません。</h4></td>
-                                        </tr>
-                                    @endforelse
-                                    </tbody>
-                                </table>
+                <div class="row">
+                                <div class="col-12">
+                                    <div class="p-2">
+                                        <form method="POST" action="{{route('setting.store')}}" class="form-horizontal" role="form" id="storeForm">
+                                            @csrf
+                                            <div class="mb-2 row">
+                                                <label class="col-md-2 col-form-label" for="keyword">メール通知</label>
+                                                <div class="col-md-10">
+                                                    <select class="form-select" name="mailStatus" id="mailStatus">
+                                                        <option class="p-2" value="on" {{($user->mailStatus == "on"?"selected":"")}}>on</option>
+                                                        <option class="p-2" value="off" {{($user->mailStatus == "off"?"selected":"")}}>off</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                     
+                                            <div class="mb-2 row">
+                                                <div class="button-list text-end">
+                                                    <input type="submit" value="設定する" class="btn btn-primary pl-4 pr-4 mr-3">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
 
-                            </div>  <!-- end row -->
-                        </div> <!-- end card body-->
-                    </div> <!-- end card -->
+                            </div>
 
                     <!-- end modal-->
                 </div>
@@ -96,42 +70,4 @@
     </div> <!-- content -->
 
 </div>
-@endsection
-
-@section('scripts')
-
-<script>
-    $(document).ready(function(){
-        $('.btn-delete-user').click(function() {
-            toastr.fire({
-                html: "この商品を削除してもよろしいでしょうか？",
-                showDenyButton: false,
-                showCancelButton: true,
-                showConfirmButton: true,
-                confirmButtonText: "確認",
-                cancelButtonText: "キャンセル",
-                confirmButtonColor: "#dc3545",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                timer: undefined
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('timeline.delete') }}",
-                        type: 'POST',
-                        data:{
-                            _token: '{{csrf_token()}}',
-                            itemId: $(this).data('id'),
-                        },
-                        success: function(result) {
-                            location.reload()
-                        }
-                    });
-                    return;
-                }
-            })
-        })
-    })
-</script>
-    
 @endsection

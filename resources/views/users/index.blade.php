@@ -42,6 +42,7 @@
                                             <th>名前</th>
                                             <th>メールアドレス</th>
                                             <th>メール数 /メール上限</th>
+                                            <th>メール通知</th>
                                             <th>ステータス</th>
                                             <th></th>
                                         </tr>
@@ -52,15 +53,21 @@
                                             <td>{{$user->name}}</td>
                                             <td>{{$user->email}}</td>
                                             <td>{{$user->mailSent}}回<br>{{$user->mailLimit}}回</td>
-                                            @if ($user->active)
                                             <td>
+                                                @if ($user->mailStatus == "on")
+                                                <span class="badge bg-primary p-1">on</span>
+                                                @else
+                                                <span class="badge bg-danger p-1">off</span>
+                                                @endif
+                                            </td>
+                                            
+                                            <td>
+                                                @if ($user->active)
                                                 <span class="badge bg-primary p-1">有効</span>
-                                            </td>
-                                            @else
-                                            <td>
+                                                @else
                                                 <span class="badge bg-danger p-1">無効</span>
+                                                @endif
                                             </td>
-                                            @endif
                                             
                                             <td>
                                                 <a href="{{ route('user.show', $user->id) }}" class="btn btn-sm btn-block btn-primary mt-1">編集</a>
