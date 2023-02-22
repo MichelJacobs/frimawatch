@@ -553,8 +553,10 @@ class SendNotification extends Command
                 }
             }
             $email = $user->email;
-            $user_id = 'trialphoenix';
-            $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
+            // $user_id = 'trialphoenix';
+            // $api_key = '2aUSJ6gntGT6paez6XPaihMc0XEXZDWJqbwIVbRmpSWXwsDCKGjUZRDjfMIjt4Hw';
+            $user_id = 'phoenix';
+            $api_key = 'lTvBUaSpw6ZsG5erwfjiAcTpxOw3zM7t4jhqSBNa0D7hll5njQwKsMj1abBVt1cK';
             \Blastengine\Client::initialize($user_id, $api_key);
             $transaction = new \Blastengine\Transaction();
             $transaction
