@@ -31,7 +31,7 @@
                                     <div class="mb-2 row">
                                         <label class="col-md-2 col-form-label" for="email">メールアドレス</label>
                                         <div class="col-md-10">
-                                        <input type="number" name="email" id="email" class="form-control" value="{{$user->email}}" placeholder="" required>
+                                        <input type="text" name="email" id="email" class="form-control" value="{{$user->email}}" placeholder="" required>
                                         </div>
                                     </div>
                                     <div class="mb-2 row">
