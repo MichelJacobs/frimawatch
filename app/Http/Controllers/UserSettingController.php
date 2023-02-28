@@ -38,7 +38,10 @@ class UserSettingController extends Controller
     public function store(Request $request)
     {
         //
-        User::where('id', auth()->user()->id)->update(array('mailStatus' => $request->mailStatus));
+        User::where('id', auth()->user()->id)->update(array(
+            'mailStatus' => $request->mailStatus,
+            'email' => $request->email
+        ));
 
         return back()->with(['system.message.success' => '設定しました。']);
     }

@@ -40,6 +40,12 @@
                                         <form method="POST" action="{{route('setting.store')}}" class="form-horizontal" role="form" id="storeForm">
                                             @csrf
                                             <div class="mb-2 row">
+                                                <label class="col-md-2 col-form-label" for="keyword">メールアドレス</label>
+                                                <div class="col-md-10">
+                                                    <input type="text" name="email" id="email" class="form-control" value="{{$user->email}}" placeholder="" required>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2 row">
                                                 <label class="col-md-2 col-form-label" for="keyword">メール通知</label>
                                                 <div class="col-md-10">
                                                     <select class="form-select" name="mailStatus" id="mailStatus">
