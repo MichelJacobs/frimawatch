@@ -28,7 +28,10 @@
                                     @csrf
                                     <input type="hidden" name="_method" value="PUT">
                                     <div class="mb-2 row">
-                                        <label class="col-md-2 col-form-label" for="monthlyMailLimit">メール上限</label>
+                                        <label class="col-md-2 col-form-label" for="email">メール上限</label>
+                                        <div class="col-md-10">
+                                            <input type="number" name="email" id="email" class="form-control" value="{{$user->email}}" placeholder="" required>
+                                        </div>
                                         <div class="col-md-10">
                                             <input type="number" name="monthlyMailLimit" id="monthlyMailLimit" class="form-control" value="{{$user->mailLimit}}" placeholder="" required>
                                         </div>

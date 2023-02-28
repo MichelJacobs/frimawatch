@@ -86,7 +86,10 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
-        User::where('id',$id)->update(array("mailLimit" => $request->monthlyMailLimit));
+        User::where('id',$id)->update(array(
+            "mailLimit" => $request->monthlyMailLimit,
+            "email" => $request->email,
+        ));
         return redirect()->action([UserController::class, 'index'])->with(['system.message.success' => "設定されました。"]);
     }
 
