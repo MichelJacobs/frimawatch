@@ -226,7 +226,7 @@ class NotificationController extends Controller
                     try {
                         $crawler->filter('.p-lists__item')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
-                            dd($node);
+                            dd($node->html());
                             $url = $node->filter('a.p-link')->attr('href');
                             $itemStatus = $node->filter('.p-link__label')->text();
                             if($status == $itemStatus) {
@@ -246,7 +246,7 @@ class NotificationController extends Controller
                             }
                         });
                     }catch(\Throwable  $e){
-                        dd($e);
+                        dd($e->getMessage());
                         continue;
                     }
                     
