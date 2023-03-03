@@ -90,9 +90,6 @@ class NotificationController extends Controller
         $services = $request->get('services');
         $status = $request->get('status');
 
-        $this->lower_price = $this->lower_price??0;
-        $this->upper_price = $this->upper_price??1000000;
-
         foreach($services as $service) {
             
             if($this->count > self::TOTAL_COUNT) break;
@@ -235,7 +232,7 @@ class NotificationController extends Controller
                             if($status == $itemStatus) {
                                 $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
                                 $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
-                                $itemName   = $node->filter('.p-link__txt--productsname')->text();
+                                $itemName   = $node->filter('.p-link__txt--productsname')->text();dd($itemName);
                                 if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
                                     array_push($this->results, [
                                         'currentPrice' => $currentPrice,
