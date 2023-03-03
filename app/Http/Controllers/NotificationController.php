@@ -90,6 +90,9 @@ class NotificationController extends Controller
         $services = $request->get('services');
         $status = $request->get('status');
 
+        $this->lower_price = $this->lower_price??0;
+        $this->upper_price = $this->upper_price??1000000;
+
         foreach($services as $service) {
             
             if($this->count > self::TOTAL_COUNT) break;
