@@ -226,10 +226,19 @@ class NotificationController extends Controller
                     try {
                         $crawler->filter('.p-lists__item')->each(function ($node) {
                             if($this->count > self::TOTAL_COUNT) return false;
-                            dd($node->html());
                             $url = $node->filter('a.p-link')->attr('href');
                             $itemStatus = $node->filter('.p-link__label')->text();
-                            if($status == $itemStatus) {
+                            $isStatus = false;
+                            if(isset($status)) {
+                                if($status == $itemStatus) {
+                                    $isStatus = true;
+                                }else{
+                                    $isStatus = false;
+                                }
+                            }else {
+                                $isStatus = true;
+                            }
+                            if($isStatus) {
                                 $itemImageUrl = $node->filter('.p-link__head img')->attr('src');
                                 $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.p-link__txt--price')->text()), 10);
                                 $itemName   = $node->filter('.p-link__txt--productsname')->text();
