@@ -543,7 +543,7 @@ class SendNotification extends Command
 
         $mailLimit = $user->mailLimit;
         
-        $urls = TimeLine::where('user_id',$user->id)->lockForUpdate()->get();
+        $urls = TimeLine::where('user_id',$user->id)->get();
         foreach($urls as $url) {
             foreach($results as $key => $result) {
                 if($url->url == $result['url']) {
