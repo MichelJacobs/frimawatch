@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('delete:duplicate')->everyFiveMinutes();
+        $schedule->command('reset:mailLimit')->monthly();
         // $schedule->command('send:email')->everyFiveMinutes()->between('7:00', '22:00');
     }
 
