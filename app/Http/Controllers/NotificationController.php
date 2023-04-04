@@ -6,9 +6,24 @@ use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Models\NotificationService;
 
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\WebDriverCheckboxes;
+use Facebook\WebDriver\WebDriverRadios;
+use Facebook\WebDriver\WebDriverSelect;
+use Symfony\Component\DomCrawler\Crawler;
+
 use Goutte\Client;
 use Symfony\Component\HttpClient\HttpClient;
 use Illuminate\Support\Facades\Http;
+
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\NotificationExport;
+use App\Imports\NotificationImport;
 
 class NotificationController extends Controller
 {
@@ -17,6 +32,7 @@ class NotificationController extends Controller
 
     protected $results = [];
     protected $count = 1;
+    protected $keyword;
     protected $lower_price;
     protected $upper_price;
     protected $excluded_word;
@@ -84,6 +100,7 @@ class NotificationController extends Controller
     public function scrape(Request $request) 
     {
         $keyword = $request->get('keyword');
+        $this->keyword = $request->get('keyword');
         $this->lower_price = $request->get('lower_price');
         $this->upper_price = $request->get('upper_price');
         $this->excluded_word = $request->get('excluded_word');
@@ -263,73 +280,47 @@ class NotificationController extends Controller
             }
 
             if (str_contains($service, 'mercari')) {
-                $client = new Client();
-                $pages = 0;
-                $pageToken = "";
-                for ($i = 0; ; $i++) {
-                    if($this->count > self::TOTAL_COUNT) break;
-                    $url = "https://api.mercari.jp/v2/entities:search";
-                    $options = array(
-                        "userId"=> "",
-                        "pageSize"=> 120,
-                        "pageToken"=> $pageToken,
-                        "searchSessionId"=> "6a0556d3330b3f3f8b87d8648c24aab1",
-                        "indexRouting"=> "INDEX_ROUTING_UNSPECIFIED",
-                        "thumbnailTypes"=> [],
-                        "searchCondition"=> array(
-                            "keyword"=> $keyword,
-                            "excludeKeyword"=> "",
-                            "sort"=> "SORT_SCORE",
-                            "order"=> "ORDER_DESC",
-                            "status"=> ["STATUS_ON_SALE"],
-                            "sizeId"=> [],
-                            "categoryId"=> [],
-                            "brandId"=> [],
-                            "sellerId"=> [],
-                            "priceMin"=> $this->lower_price??0,
-                            "priceMax"=> $this->upper_price??1000000,
-                            "itemConditionId"=> [],
-                            "shippingPayerId"=> [],
-                            "shippingFromArea"=> [],
-                            "shippingMethod"=> [],
-                            "colorId"=> [],
-                            "hasCoupon"=> false,
-                            "attributes"=> [],
-                            "itemTypes"=> [],
-                            "skuIds"=> []
-                        ),
-                        "defaultDatasets"=> [
-                            "DATASET_TYPE_MERCARI",
-                            "DATASET_TYPE_BEYOND"
-                        ],
-                        "serviceFrom"=> "suruga",
-                        "withItemBrand"=> false,
-                        "withItemSize"=> false
-                    );
-                    $response = Http::withHeaders([
-                        'dpop' => config('constants.options.drop'),
-                        'x-platform' => 'web'
-                    ])->post($url,$options);
-                    $hitItems = $response->object()->items;
-                    $pageToken = $response->object()->meta->nextPageToken;
-                    
-                    foreach($hitItems as $item) {
-                        if($this->count > self::TOTAL_COUNT) break;
-                        if($this->compareWords($this->excluded_word, $item->name )){
+                if($this->count > self::TOTAL_COUNT) break;
+                $this->initBrowser();
+                $this->results = [];
+
+                $url = "https://jp.mercari.com/search?keyword=".$this->keyword;
+                if(isset($this->lower_price)){
+                    $url .= '&price_min='.$this->lower_price;
+                }
+                $url .= '&status=on_sale';
+                if(isset($this->upper_price)){
+                    $url .= '&price_max='.$this->upper_price;
+                }
+                if(isset($this->upper_price)){
+                    $url .= '&price_max='.$this->upper_price;
+                }
+
+                $crawler = $this->getPageHTMLUsingBrowser($url);
+                try {
+                    $crawler->filter('#item-grid li')->each(function ($node) {
+                        if($this->count > self::TOTAL_COUNT) return false;
+                        $url = $node->filter('a')->attr('href');
+                        $itemImageUrl = $node->filter('mer-item-thumbnail')->attr('src');
+                        $itemName   = $node->filter('mer-item-thumbnail')->attr('alt');
+                        $itemName = str_replace("のサムネイル","",$itemName);
+                        $price = $node->filter('mer-item-thumbnail')->attr('price');
+                        if($this->compareWords($this->excluded_word, $itemName )){
                             array_push($this->results, [
-                                'currentPrice' => $item->price,
-                                'itemImageUrl' => $item->thumbnails[0],
-                                'itemName' => $item->name,
-                                'url' => 'https://jp.mercari.com/item/'.$item->id,
+                                'currentPrice' => $price,
+                                'itemImageUrl' => $itemImageUrl,
+                                'itemName' => $itemName,
+                                'url' => 'https://jp.mercari.com'.$url,
                                 'service' => 'mercari',
                             ]);
-                            $this->count++;
                         }
-                    }
-
-                    if($pageToken == "") break;
-                    
+                        $this->count++;
+                    });
+                }catch(\Throwable  $e){
+                    $this->driver->close();
                 }
+                $this->driver->close();
+         
             }
 
             if (str_contains($service, 'yahooflat')) {
@@ -521,6 +512,73 @@ class NotificationController extends Controller
         }
 
         return $str;
+    }
+
+    public function import($userId){
+        try {
+            set_time_limit(0);
+            ini_set('max_execution_time', 0); 
+            $file = request()->file('file');
+            $folder = '/tmp/';
+            $filename = $file->getClientOriginalName();
+            $path = $folder . $filename;
+            $file->move($folder, $filename);
+            $handle = fopen($path, 'r');
+            $content = fread($handle, filesize($path));
+            $enc = mb_detect_encoding($content, mb_list_encodings(), true);
+            if (strtolower($enc) !== 'utf-8') {
+                return back()->with(['system.message.info' => __('アップロードしたファイルの文字コードは、「' . $enc . '」です。UTF-8でアップロードしてください。')]);
+            }
+            Excel::import(new NotificationImport($userId), $path);
+        } catch (\Throwable $e) {
+            dd($e);
+            return back()->with(['system.message.info' => __('CSVファイルのアップロードに失敗しました')]);
+        }
+
+        return back()->with(['system.message.success' => __(':itemが完了しました。', ['item' => __('アップロード(CSV)')])]);
+    }
+
+    public function export($userId)
+    {
+        try{
+            return Excel::download(new NotificationExport($userId), '通知一覧.csv', \Maatwebsite\Excel\Excel::CSV);
+        }catch (\Throwable $e) {
+            dd($e->getMessage());
+        }
+    }
+    /**
+     * Get page using browser.
+     */
+    public function getPageHTMLUsingBrowser(string $url)
+    {
+        $response = $this->driver->get($url);
+
+        $this->driver->wait(5000,1000)->until(
+            function () {
+                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'search-result')]"));
+                sleep(3);
+                return count($elements) > 0;
+            },
+        );
+        
+        return new Crawler($response->getPageSource(), $url);
+    }
+    /**
+     * Init browser.
+     */
+    public function initBrowser()
+    {
+        $options = new ChromeOptions();
+        // $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images', '--headless'];
+        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images'];
+
+        $options->addArguments($arguments);
+
+        $caps = DesiredCapabilities::chrome();
+        $caps->setCapability('acceptSslCerts', false);
+        $caps->setCapability(ChromeOptions::CAPABILITY, $options);
+        
+        $this->driver = RemoteWebDriver::create('http://localhost:4444', $caps);
     }
 
     public function productTimeCompare($productTime){

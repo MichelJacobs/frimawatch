@@ -11,6 +11,17 @@ use App\Models\Notification;
 use App\Models\NotificationService;
 use DB;
 
+use Facebook\WebDriver\Chrome\ChromeOptions;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver\Remote\DesiredCapabilities;
+use Facebook\WebDriver\WebDriverExpectedCondition;
+use Facebook\WebDriver\WebDriverBy;
+use Facebook\WebDriver\WebDriverDimension;
+use Facebook\WebDriver\WebDriverCheckboxes;
+use Facebook\WebDriver\WebDriverRadios;
+use Facebook\WebDriver\WebDriverSelect;
+use Symfony\Component\DomCrawler\Crawler;
+
 use Goutte\Client;
 use Symfony\Component\HttpClient\HttpClient;
 use Illuminate\Support\Facades\Http;
@@ -256,73 +267,47 @@ class SendNotification extends Command
                     }
 
                     if (str_contains($service, 'mercari')) {
-                        $client = new Client();
-                        $pages = 0;
-                        $pageToken = "";
-                        for ($i = 0; ; $i++) {
-                            if($this->count > self::SENT_COUNT) break;
-                            $url = "https://api.mercari.jp/v2/entities:search";
-                            $options = array(
-                                "userId"=> "",
-                                "pageSize"=> 120,
-                                "pageToken"=> $pageToken,
-                                "searchSessionId"=> "6a0556d3330b3f3f8b87d8648c24aab1",
-                                "indexRouting"=> "INDEX_ROUTING_UNSPECIFIED",
-                                "thumbnailTypes"=> [],
-                                "searchCondition"=> array(
-                                    "keyword"=> $keyword,
-                                    "excludeKeyword"=> "",
-                                    "sort"=> "SORT_SCORE",
-                                    "order"=> "ORDER_DESC",
-                                    "status"=> ["STATUS_ON_SALE"],
-                                    "sizeId"=> [],
-                                    "categoryId"=> [],
-                                    "brandId"=> [],
-                                    "sellerId"=> [],
-                                    "priceMin"=> $this->lower_price??0,
-                                    "priceMax"=> $this->upper_price??1000000,
-                                    "itemConditionId"=> [],
-                                    "shippingPayerId"=> [],
-                                    "shippingFromArea"=> [],
-                                    "shippingMethod"=> [],
-                                    "colorId"=> [],
-                                    "hasCoupon"=> false,
-                                    "attributes"=> [],
-                                    "itemTypes"=> [],
-                                    "skuIds"=> []
-                                ),
-                                "defaultDatasets"=> [
-                                    "DATASET_TYPE_MERCARI",
-                                    "DATASET_TYPE_BEYOND"
-                                ],
-                                "serviceFrom"=> "suruga",
-                                "withItemBrand"=> false,
-                                "withItemSize"=> false
-                            );
-                            $response = Http::withHeaders([
-                                'dpop' => config('constants.options.drop'),
-                                'x-platform' => 'web'
-                            ])->post($url,$options);
-                            $hitItems = $response->object()->items;
-                            $pageToken = $response->object()->meta->nextPageToken;
-                            
-                            foreach($hitItems as $item) {
-                                if($this->count > self::SENT_COUNT) break;
-                                if($this->compareWords($this->excluded_word, $item->name )){
+                        if($this->count > self::SENT_COUNT) break;
+                        $this->initBrowser();
+                        $this->results = [];
+
+                        $url = "https://jp.mercari.com/search?keyword=".$this->keyword;
+                        if(isset($this->lower_price)){
+                            $url .= '&price_min='.$this->lower_price;
+                        }
+                        $url .= '&status=on_sale';
+                        if(isset($this->upper_price)){
+                            $url .= '&price_max='.$this->upper_price;
+                        }
+                        if(isset($this->upper_price)){
+                            $url .= '&price_max='.$this->upper_price;
+                        }
+
+                        $crawler = $this->getPageHTMLUsingBrowser($url);
+                        try {
+                            $crawler->filter('#item-grid li')->each(function ($node) {
+                                if($this->count > self::SENT_COUNT) return false;
+                                $url = $node->filter('a')->attr('href');
+                                $itemImageUrl = $node->filter('mer-item-thumbnail')->attr('src');
+                                $itemName   = $node->filter('mer-item-thumbnail')->attr('alt');
+                                $itemName = str_replace("のサムネイル","",$itemName);
+                                $price = $node->filter('mer-item-thumbnail')->attr('price');
+                                if($this->compareWords($this->excluded_word, $itemName )){
                                     array_push($this->results, [
-                                        'currentPrice' => $item->price,
-                                        'itemImageUrl' => $item->thumbnails[0],
-                                        'itemName' => $item->name,
-                                        'url' => 'https://jp.mercari.com/item/'.$item->id,
+                                        'currentPrice' => $price,
+                                        'itemImageUrl' => $itemImageUrl,
+                                        'itemName' => $itemName,
+                                        'url' => 'https://jp.mercari.com'.$url,
                                         'service' => 'mercari',
                                     ]);
-                                    $this->count++;
                                 }
-                            }
-
-                            if($pageToken == "") break;
-                            
+                                $this->count++;
+                            });
+                        }catch(\Throwable  $e){
+                            $this->driver->close();
                         }
+                        $this->driver->close();
+                            
                     }
 
                     if (str_contains($service, 'yahooflat')) {
@@ -490,6 +475,41 @@ class SendNotification extends Command
         }
         $this->info("end");
         return 0;
+    }
+
+    /**
+     * Get page using browser.
+     */
+    public function getPageHTMLUsingBrowser(string $url)
+    {
+        $response = $this->driver->get($url);
+
+        $this->driver->wait(5000,1000)->until(
+            function () {
+                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'search-result')]"));
+                sleep(3);
+                return count($elements) > 0;
+            },
+        );
+        
+        return new Crawler($response->getPageSource(), $url);
+    }
+    /**
+     * Init browser.
+     */
+    public function initBrowser()
+    {
+        $options = new ChromeOptions();
+        // $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images', '--headless'];
+        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images'];
+
+        $options->addArguments($arguments);
+
+        $caps = DesiredCapabilities::chrome();
+        $caps->setCapability('acceptSslCerts', false);
+        $caps->setCapability(ChromeOptions::CAPABILITY, $options);
+        
+        $this->driver = RemoteWebDriver::create('http://localhost:4444', $caps);
     }
 
     public function productTimeCompare($productTime){

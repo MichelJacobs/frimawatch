@@ -36,13 +36,17 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row table-responsive">
-                                <div class="button-list text-end">
-                                    <a href="{{route('notification.create')}}" class="btn btn-sm btn-primary mr-3 mb-3 btn-done">新しいアラートを作る</a>
-                                </div>
+                                <div class="row">
+                                    <label class="col-sm-2">
+                                        メール数: <span class="text-danger">{{ $user->mailSent }}回</span><br>
+                                        メール上限<span class="text-danger"> {{$user->mailLimit}}回</span>
+                                    </label>
+                                    <div class="col-sm-10" style="text-align:right;">
+                                        <a href="{{route('notification.export',$user->id)}}" class="btn btn-sm btn-success mr-3 mb-1" target="_blank">CSV出力</a>
+                                        <button type="button" class="btn btn-sm btn-warning mr-3 mb-1" id="btnImport"><i class="fas fa-file-csv mr-2"></i>アップロード(CSV)</button>
+                                        <a href="{{route('notification.create')}}" class="btn btn-sm btn-primary mr-3 mb-1 btn-done">アラートを作る</a>
+                                    </div>
 
-                                <div class="button-list text-end mb-2">
-                                    メール数<span class="text-danger"> {{$user->mailSent}}回</span><br>
-                                    メール上限<span class="text-danger"> {{$user->mailLimit}}回</span>
                                 </div>
                                 
                                 <table class="table table-striped">
@@ -131,5 +135,27 @@
 
     </div> <!-- content -->
 
+    <form method="POST" action="{{route('notification.import',$user->id)}}" accept-charset="UTF-8" id="importForm" enctype="multipart/form-data">
+        @csrf
+        <input type="file" name="file" id="customFile" accept="text/csv" style="display: none;">
+    </form>
+
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function() {
+        $('#btnImport').click(function() {
+            $('#customFile').click();
+        })
+    })
+
+    $('#customFile').change(function(e) {
+        var file = e.target.files[0];
+        if (file === undefined) return;
+        
+        $('#importForm').submit();
+    })
+</script>
 @endsection

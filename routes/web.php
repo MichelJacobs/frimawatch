@@ -21,6 +21,8 @@ Auth::routes();
 
 Route::middleware(['auth', 'user'])->group(function () {
     Route::resource('/notification', 'App\Http\Controllers\NotificationController');
+    Route::get('/notification/{userId}/export','App\Http\Controllers\NotificationController@export')->name('notification.export');
+    Route::post('/notification/{userId}/import','App\Http\Controllers\NotificationController@import')->name('notification.import');
     Route::post('/scrape', 'App\Http\Controllers\NotificationController@scrape')->name('scrape');
     Route::resource('/search', 'App\Http\Controllers\SearchController');
     Route::resource('/timeline', 'App\Http\Controllers\TimeLineController');
