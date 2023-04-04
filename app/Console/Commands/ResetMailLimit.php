@@ -40,10 +40,9 @@ class ResetMailLimit extends Command
      */
     public function handle()
     {
-        // User::where('is_admin',0)->update(array(
-        //     'mailSent' => 0
-        // ));
-        $this->info("rest:maillimit");
+        User::where('is_admin',0)->update(array(
+            'mailSent' => 0
+        ));
         return 0;
     }
 }
