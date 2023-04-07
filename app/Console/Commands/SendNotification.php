@@ -575,7 +575,7 @@ class SendNotification extends Command
             
             foreach($items as $item) {
                 
-                $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".$item['currentPrice']."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL;
+                $content .= "商品名　".$item['itemName']. PHP_EOL ."商品価格　".number_format($item['currentPrice'])."円". PHP_EOL ."商品サービス　".$item['service']. PHP_EOL ."商品ページ ".$item['url']. PHP_EOL;
                 if(isset($this->keyword)) {
                     $content .= "キーワード : " .$this->keyword. PHP_EOL . PHP_EOL . PHP_EOL;
                 }

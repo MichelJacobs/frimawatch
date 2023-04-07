@@ -70,7 +70,7 @@
                                                     <img src="{{$timeline->itemImageUrl}}" alt="" srcset="" width="100px" height="100px">
                                                 </td>
                                                 <td style="line-height: 2rem">
-                                                    <span class="text-danger">{{$timeline->currentPrice}}円</span>&nbsp;
+                                                    <span class="text-danger">{{number_format($timeline->currentPrice)}}円</span>&nbsp;
                                                     @if(isset($timeline->keyword))
                                                     キーワード : {{$timeline->keyword??''}}
                                                     @endif
