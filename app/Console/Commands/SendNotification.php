@@ -304,9 +304,9 @@ class SendNotification extends Command
                                 $this->count++;
                             });
                         }catch(\Throwable  $e){
-                            $this->driver->close();
+                            $this->driver->quit();
                         }
-                        $this->driver->close();
+                        $this->driver->quit();
                             
                     }
 
