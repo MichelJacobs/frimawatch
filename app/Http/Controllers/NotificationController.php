@@ -317,7 +317,7 @@ class NotificationController extends Controller
                         $this->count++;
                     });
                 }catch(\Throwable  $e){
-                    $this->driver->close();
+                    
                 }
                 $this->driver->close();
          
