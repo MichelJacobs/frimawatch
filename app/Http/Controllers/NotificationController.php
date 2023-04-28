@@ -182,6 +182,8 @@ class NotificationController extends Controller
                 $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
+
+                dd($crawler->html());
                 
                 try {
                     $crawler->filter('.js-favorite')->each(function ($node) {
