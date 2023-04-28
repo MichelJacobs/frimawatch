@@ -564,7 +564,7 @@ class NotificationController extends Controller
 
         $this->driver->wait(5000,1000)->until(
             function () {
-                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'searchResultListWrapper')]"));
+                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'ecMain')]"));
                 sleep(3);
                 return count($elements) > 0;
             },
