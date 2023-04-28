@@ -179,7 +179,17 @@ class NotificationController extends Controller
                 $this->initBrowser();
                 $this->results = [];
 
-                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";dd($url);
+                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
+
+                if(isset($this->lower_price)){
+                    $url .= '&minPrice='.$this->lower_price;
+                }
+                
+                if(isset($this->upper_price)){
+                    $url .= '&maxPrice='.$this->upper_price;
+                }
+
+                $url .= '&search=OK';
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
 
