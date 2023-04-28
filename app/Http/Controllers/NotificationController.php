@@ -195,12 +195,13 @@ class NotificationController extends Controller
                         $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
                         $crawler = $client->request('GET', $url);
                     }
+                    dd($crawler);
                     $crawler->filter('.js-favorite')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
-                        $url = $node->filter('a.listLink')->attr('href');
-                        $itemImageUrl = $node->filter('.imgBlock img')->attr('data-src');
-                        $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.price')->text()), 10);
-                        $itemName   = $node->filter('.name-goods')->text();
+                        $url = $node->filter('a.itemCard_inner')->attr('href');
+                        $itemImageUrl = $node->filter('.itemCard_img img')->attr('src');
+                        $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.itemCard_price')->text()), 10);
+                        $itemName   = $node->filter('.itemCard_name')->text();
 
                         if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
                             array_push($this->results, [
@@ -297,6 +298,7 @@ class NotificationController extends Controller
                 }
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
+                
                 try {
                     $crawler->filter('#item-grid li')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
@@ -320,6 +322,7 @@ class NotificationController extends Controller
                     
                 }
                 $this->driver->close();
+                dd($crawler->html());
          
             }
 
