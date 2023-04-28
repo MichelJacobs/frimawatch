@@ -183,6 +183,7 @@ class NotificationController extends Controller
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
 
+                $this->driver->close();
                 dd($crawler->html());
                 
                 try {
@@ -290,6 +291,9 @@ class NotificationController extends Controller
                 }
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
+                
+                $this->driver->close();
+                dd($crawler->html());
                 
                 try {
                     $crawler->filter('#item-grid li')->each(function ($node) {
