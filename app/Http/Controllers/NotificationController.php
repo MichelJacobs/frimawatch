@@ -191,7 +191,7 @@ class NotificationController extends Controller
 
                 $url .= '&search=OK';
 
-                $crawler = $this->getPageHTMLUsingBrowser($url);
+                $crawler = $this->getPageSecondHTMLUsingBrowser($url);
 
                 $this->driver->close();
                 dd($crawler->html());
@@ -553,6 +553,24 @@ class NotificationController extends Controller
         }catch (\Throwable $e) {
             dd($e->getMessage());
         }
+    }
+
+        /**
+     * Get page using browser.
+     */
+    public function getPageSecondHTMLUsingBrowser(string $url)
+    {
+        $response = $this->driver->get($url);
+
+        $this->driver->wait(5000,1000)->until(
+            function () {
+                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'searchResultListWrapper')]"));
+                sleep(3);
+                return count($elements) > 0;
+            },
+        );
+        
+        return new Crawler($response->getPageSource(), $url);
     }
     /**
      * Get page using browser.
