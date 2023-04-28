@@ -174,28 +174,16 @@ class NotificationController extends Controller
             }
 
             if (str_contains($service, '2ndstreet')) {
-                $client = new Client();
-                $pages = 0;
-                // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-                for ($i = 0; $i < $pages + 1; $i++) {
-                    if($this->count > self::TOTAL_COUNT) break;
-                    if($i == 0 ){
-                        $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
-                        $crawler = $client->request('GET', $url);
-                        try {
-                            $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
-                            ? $crawler->filter('nav.ecPager li:nth-last-child(2)')->text()
-                            : 0
-                        ;
-                        }catch(\Throwable  $e){
-                            $pages = 0;break;
-                        }
-                        
-                    }else {
-                        $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
-                        $crawler = $client->request('GET', $url);
-                    }
-                    dd($crawler);
+
+                if($this->count > self::TOTAL_COUNT) break;
+                $this->initBrowser();
+                $this->results = [];
+
+                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
+
+                $crawler = $this->getPageHTMLUsingBrowser($url);
+                
+                try {
                     $crawler->filter('.js-favorite')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a.itemCard_inner')->attr('href');
@@ -214,8 +202,10 @@ class NotificationController extends Controller
                             $this->count++;
                         }
                     });
+                }catch(\Throwable  $e){
                     
                 }
+                $this->driver->close();
             }
 
             if (str_contains($service, 'komehyo')) {
@@ -322,7 +312,6 @@ class NotificationController extends Controller
                     
                 }
                 $this->driver->close();
-                dd($crawler->html());
          
             }
 
