@@ -179,7 +179,7 @@ class NotificationController extends Controller
                 $this->initBrowser();
                 $this->results = [];
 
-                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
+                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";dd($url);
 
                 $crawler = $this->getPageHTMLUsingBrowser($url);
 
@@ -294,7 +294,7 @@ class NotificationController extends Controller
                 
                 $this->driver->close();
                 dd($crawler->html());
-                
+
                 try {
                     $crawler->filter('#item-grid li')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
