@@ -191,7 +191,11 @@ class NotificationController extends Controller
 
                 $url .= '&search=OK';
 
-                $crawler = $this->getPageSecondHTMLUsingBrowser($url);
+                try {
+                    $crawler = $this->getPageSecondHTMLUsingBrowser($url);
+                }catch(\Throwable  $e){
+                    dd($e);
+                }
 
                 $this->driver->close();
                 dd($crawler->html());
