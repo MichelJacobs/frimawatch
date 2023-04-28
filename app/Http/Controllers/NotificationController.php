@@ -564,7 +564,7 @@ class NotificationController extends Controller
      */
     public function getPageSecondHTMLUsingBrowser(string $url)
     {
-        $response = $this->driver->get($url);
+        $response = $this->driver->get($url);dd($response);
 
         $this->driver->wait(5000,1000)->until(
             function () {
