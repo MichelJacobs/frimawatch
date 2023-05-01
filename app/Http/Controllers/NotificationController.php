@@ -99,6 +99,7 @@ class NotificationController extends Controller
 
     public function scrape(Request $request) 
     {
+        ini_set('max_execution_time', 999999);
         $keyword = $request->get('keyword');
         $this->keyword = $request->get('keyword');
         $this->lower_price = $request->get('lower_price');
@@ -191,14 +192,12 @@ class NotificationController extends Controller
 
                 $url .= '&search=OK';
 
-                try {
-                    $crawler = $this->getPageSecondHTMLUsingBrowser($url);
-                }catch(\Throwable  $e){
-                    dd($e);
-                }
+                
+                $response = $this->driver->get($url);
+
+                $crawler = new Crawler($response->getPageSource());
 
                 $this->driver->close();
-                dd($crawler->html());
                 
                 try {
                     $crawler->filter('.js-favorite')->each(function ($node) {
@@ -222,7 +221,6 @@ class NotificationController extends Controller
                 }catch(\Throwable  $e){
                     
                 }
-                $this->driver->close();
             }
 
             if (str_contains($service, 'komehyo')) {
@@ -303,20 +301,18 @@ class NotificationController extends Controller
                 if(isset($this->upper_price)){
                     $url .= '&price_max='.$this->upper_price;
                 }
-
                 $crawler = $this->getPageHTMLUsingBrowser($url);
-                
+
                 $this->driver->close();
-                dd($crawler->html());
 
                 try {
                     $crawler->filter('#item-grid li')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
                         $url = $node->filter('a')->attr('href');
-                        $itemImageUrl = $node->filter('mer-item-thumbnail')->attr('src');
-                        $itemName   = $node->filter('mer-item-thumbnail')->attr('alt');
+                        $itemImageUrl = $node->filter('source img')->attr('src');
+                        $itemName   = $node->filter('source img')->attr('alt');
                         $itemName = str_replace("のサムネイル","",$itemName);
-                        $price = $node->filter('mer-item-thumbnail')->attr('price');
+                        $price = intval(preg_replace('/[^0-9]+/', '', $node->filter('figure')->text()), 10);
                         if($this->compareWords($this->excluded_word, $itemName )){
                             array_push($this->results, [
                                 'currentPrice' => $price,
@@ -331,7 +327,6 @@ class NotificationController extends Controller
                 }catch(\Throwable  $e){
                     
                 }
-                $this->driver->close();
          
             }
 
@@ -559,23 +554,6 @@ class NotificationController extends Controller
         }
     }
 
-        /**
-     * Get page using browser.
-     */
-    public function getPageSecondHTMLUsingBrowser(string $url)
-    {
-        $response = $this->driver->get($url);dd($response);
-
-        $this->driver->wait(5000,1000)->until(
-            function () {
-                $elements = $this->driver->findElements(WebDriverBy::XPath("//div[contains(@id,'ecMain')]"));
-                sleep(3);
-                return count($elements) > 0;
-            },
-        );
-        
-        return new Crawler($response->getPageSource(), $url);
-    }
     /**
      * Get page using browser.
      */
@@ -599,7 +577,7 @@ class NotificationController extends Controller
     public function initBrowser()
     {
         $options = new ChromeOptions();
-        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images', '--headless'];
+        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images'];
 
         $options->addArguments($arguments);
 

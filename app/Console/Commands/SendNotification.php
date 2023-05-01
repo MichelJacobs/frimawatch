@@ -161,34 +161,38 @@ class SendNotification extends Command
                     }
 
                     if (str_contains($service, '2ndstreet')) {
-                        $client = new Client();
-                        $pages = 0;
-                        // $new = mb_convert_encoding($keyword, "SJIS", "UTF-8");
-                        for ($i = 0; $i < $pages + 1; $i++) {
-                            if($this->count > self::SENT_COUNT) break;
-                            if($i == 0 ){
-                                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
-                                $crawler = $client->request('GET', $url);
-                                try {
-                                    $pages = ($crawler->filter('nav.ecPager li')->count() > 0)
-                                    ? $crawler->filter('nav.ecPager li:nth-last-child(2)')->text()
-                                    : 0
-                                ;
-                                }catch(\Throwable  $e){
-                                    $pages = 0;break;
-                                }
-                                
-                            }else {
-                                $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=".$i;
-                                $crawler = $client->request('GET', $url);
-                            }
+
+                        if($this->count > self::SENT_COUNT) break;
+                        $this->initBrowser();
+                        $this->results = [];
+        
+                        $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
+        
+                        if(isset($this->lower_price)){
+                            $url .= '&minPrice='.$this->lower_price;
+                        }
+                        
+                        if(isset($this->upper_price)){
+                            $url .= '&maxPrice='.$this->upper_price;
+                        }
+        
+                        $url .= '&search=OK';
+        
+                        
+                        $response = $this->driver->get($url);
+        
+                        $crawler = new Crawler($response->getPageSource());
+        
+                        $this->driver->close();
+                        
+                        try {
                             $crawler->filter('.js-favorite')->each(function ($node) {
                                 if($this->count > self::SENT_COUNT) return false;
-                                $url = $node->filter('a.listLink')->attr('href');
-                                $itemImageUrl = $node->filter('.imgBlock img')->attr('data-src');
-                                $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.price')->text()), 10);
-                                $itemName   = $node->filter('.name-goods')->text();
-
+                                $url = $node->filter('a.itemCard_inner')->attr('href');
+                                $itemImageUrl = $node->filter('.itemCard_img img')->attr('src');
+                                $currentPrice = intval(preg_replace('/[^0-9]+/', '', $node->filter('.itemCard_price')->text()), 10);
+                                $itemName   = $node->filter('.itemCard_name')->text();
+        
                                 if($this->compareCondition($this->lower_price, $this->upper_price,$this->excluded_word, $currentPrice, $itemName )){
                                     array_push($this->results, [
                                         'currentPrice' => $currentPrice,
@@ -200,6 +204,7 @@ class SendNotification extends Command
                                     $this->count++;
                                 }
                             });
+                        }catch(\Throwable  $e){
                             
                         }
                     }
@@ -270,7 +275,7 @@ class SendNotification extends Command
                         if($this->count > self::SENT_COUNT) break;
                         $this->initBrowser();
                         $this->results = [];
-
+        
                         $url = "https://jp.mercari.com/search?keyword=".$this->keyword;
                         if(isset($this->lower_price)){
                             $url .= '&price_min='.$this->lower_price;
@@ -282,16 +287,18 @@ class SendNotification extends Command
                         if(isset($this->upper_price)){
                             $url .= '&price_max='.$this->upper_price;
                         }
-
                         $crawler = $this->getPageHTMLUsingBrowser($url);
+        
+                        $this->driver->close();
+        
                         try {
                             $crawler->filter('#item-grid li')->each(function ($node) {
                                 if($this->count > self::SENT_COUNT) return false;
                                 $url = $node->filter('a')->attr('href');
-                                $itemImageUrl = $node->filter('mer-item-thumbnail')->attr('src');
-                                $itemName   = $node->filter('mer-item-thumbnail')->attr('alt');
+                                $itemImageUrl = $node->filter('source img')->attr('src');
+                                $itemName   = $node->filter('source img')->attr('alt');
                                 $itemName = str_replace("のサムネイル","",$itemName);
-                                $price = $node->filter('mer-item-thumbnail')->attr('price');
+                                $price = intval(preg_replace('/[^0-9]+/', '', $node->filter('figure')->text()), 10);
                                 if($this->compareWords($this->excluded_word, $itemName )){
                                     array_push($this->results, [
                                         'currentPrice' => $price,
@@ -306,8 +313,7 @@ class SendNotification extends Command
                         }catch(\Throwable  $e){
                             
                         }
-                        $this->driver->close();
-                            
+                 
                     }
 
                     if (str_contains($service, 'yahooflat')) {
