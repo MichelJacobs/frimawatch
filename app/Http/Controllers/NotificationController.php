@@ -198,8 +198,6 @@ class NotificationController extends Controller
 
                 $this->driver->close();
 
-                echo $crawler->html();
-                
                 try {
                     $crawler->filter('.js-favorite')->each(function ($node) {
                         if($this->count > self::TOTAL_COUNT) return false;
