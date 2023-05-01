@@ -577,7 +577,7 @@ class NotificationController extends Controller
     public function initBrowser()
     {
         $options = new ChromeOptions();
-        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images'];
+        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images', '--headless'];
 
         $options->addArguments($arguments);
 
