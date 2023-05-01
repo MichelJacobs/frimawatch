@@ -192,12 +192,13 @@ class NotificationController extends Controller
 
                 $url .= '&search=OK';
 
-                
                 $response = $this->driver->get($url);
 
                 $crawler = new Crawler($response->getPageSource());
 
                 $this->driver->close();
+
+                echo $crawler->html();
                 
                 try {
                     $crawler->filter('.js-favorite')->each(function ($node) {
