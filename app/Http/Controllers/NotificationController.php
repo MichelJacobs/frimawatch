@@ -177,7 +177,7 @@ class NotificationController extends Controller
             if (str_contains($service, '2ndstreet')) {
 
                 if($this->count > self::TOTAL_COUNT) break;
-                $this->initBrowser();
+                $this->initProxyBrowser();
                 $this->results = [];
 
                 $url = "https://www.2ndstreet.jp/search?keyword=".$keyword."&page=0";
@@ -582,6 +582,34 @@ class NotificationController extends Controller
 
         $caps = DesiredCapabilities::chrome();
         $caps->setCapability('acceptSslCerts', false);
+        
+        $caps->setCapability(ChromeOptions::CAPABILITY, $options);
+        
+        $this->driver = RemoteWebDriver::create('http://localhost:4444', $caps);
+    }
+
+    /**
+     * Init browser.
+     */
+    public function initProxyBrowser()
+    {
+        $options = new ChromeOptions();
+        $arguments = ['--disable-gpu', '--no-sandbox', '--disable-images', '--headless'];
+
+        $options->addArguments($arguments);
+
+        // $caps = DesiredCapabilities::chrome();
+        // $caps->setCapability('acceptSslCerts', false);
+
+        $caps = new DesiredCapabilities([
+            WebDriverCapabilityType::BROWSER_NAME => 'chrome',
+            WebDriverCapabilityType::PROXY => [
+                'proxyType' => 'manual',
+                'httpProxy' => 'https://wjptest.azurewebsites.net',
+                'sslProxy' => 'https://wjptest.azurewebsites.net',
+            ],
+        ]);
+
         $caps->setCapability(ChromeOptions::CAPABILITY, $options);
         
         $this->driver = RemoteWebDriver::create('http://localhost:4444', $caps);
