@@ -606,8 +606,8 @@ class NotificationController extends Controller
             WebDriverCapabilityType::BROWSER_NAME => 'chrome',
             WebDriverCapabilityType::PROXY => [
                 'proxyType' => 'manual',
-                'httpProxy' => 'http://20.210.113.32:8123',
-                'sslProxy' => 'http://20.210.113.32:8123',
+                'httpProxy' => 'http://103.37.88.10:80',
+                'sslProxy' => 'http://103.37.88.10:80',
             ],
         ]);
 
