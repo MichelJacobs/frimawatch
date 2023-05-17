@@ -606,8 +606,8 @@ class NotificationController extends Controller
             WebDriverCapabilityType::BROWSER_NAME => 'chrome',
             WebDriverCapabilityType::PROXY => [
                 'proxyType' => 'manual',
-                'httpProxy' => 'https://wjptest.azurewebsites.net',
-                'sslProxy' => 'https://wjptest.azurewebsites.net',
+                'httpProxy' => 'http://20.210.113.32:8123',
+                'sslProxy' => 'http://20.210.113.32:8123',
             ],
         ]);
 
